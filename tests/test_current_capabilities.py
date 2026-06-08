@@ -10,6 +10,7 @@ CAPABILITIES_PATH = REPO_ROOT / "docs" / "design" / "current-capabilities.md"
 RELEASE_CHECKLIST_PATH = REPO_ROOT / "docs" / "release" / "v0.8-release-checklist.md"
 USAGE_WALKTHROUGH_PATH = REPO_ROOT / "docs" / "usage" / "walkthrough.md"
 TARGET_STRUCTURE_PATH = REPO_ROOT / "docs" / "usage" / "generated-target-structure.md"
+README_ZH_PATH = REPO_ROOT / "README.zh-CN.md"
 
 
 class CurrentCapabilitiesManifestTest(unittest.TestCase):
@@ -30,11 +31,12 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
         self.assertTrue(RELEASE_CHECKLIST_PATH.exists())
         self.assertTrue(USAGE_WALKTHROUGH_PATH.exists())
         self.assertTrue(TARGET_STRUCTURE_PATH.exists())
+        self.assertTrue(README_ZH_PATH.exists())
 
-    def test_readme_current_support_line_matches_phase10_surface(self) -> None:
+    def test_readme_current_support_line_matches_phase13_surface(self) -> None:
         readme = README_PATH.read_text(encoding="utf-8")
         support_line = next(
-            line for line in readme.splitlines() if line.startswith("Phase 10 currently supports ")
+            line for line in readme.splitlines() if line.startswith("Phase 13 currently supports ")
         )
         self.assertIn("ai-init small", support_line)
         self.assertIn("ai-upgrade large", support_line)
@@ -66,9 +68,9 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
                 command,
             )
 
-    def test_readme_and_capabilities_doc_expose_phase10_contract(self) -> None:
+    def test_readme_and_capabilities_doc_expose_skill_consolidation_contract(self) -> None:
         combined = README_PATH.read_text(encoding="utf-8") + "\n" + CAPABILITIES_PATH.read_text(encoding="utf-8")
-        self.assertIn("v1.0-phase10", combined)
+        self.assertIn("v1.3-skill-creator-zh-readme", combined)
         self.assertIn("ai-context-pack", combined)
         self.assertIn("ai-handoff", combined)
         self.assertIn("ai-review spec", combined)
@@ -82,6 +84,9 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
         self.assertIn("No new CLI commands", combined)
         self.assertIn("subagent role templates", combined)
         self.assertIn("skills templates", combined)
+        self.assertIn("maps subagent roles to recommended local skills", combined)
+        self.assertIn("provenance", combined)
+        self.assertIn("Chinese README", combined)
 
     def test_readme_does_not_claim_subagent_or_skills_are_implemented(self) -> None:
         readme = README_PATH.read_text(encoding="utf-8")
@@ -106,6 +111,12 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
         self.assertIn("If skills are unavailable", combined)
         self.assertIn("local project-level enhancement templates", combined)
         self.assertIn(".agents/skills/", combined)
+
+    def test_chinese_readme_exposes_current_baseline(self) -> None:
+        content = README_ZH_PATH.read_text(encoding="utf-8")
+        self.assertIn("v1.3-skill-creator-zh-readme", content)
+        self.assertIn("skill-creator", content)
+        self.assertIn("仍未实现", content)
 
 
 

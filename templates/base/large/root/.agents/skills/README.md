@@ -17,3 +17,45 @@ Current skill groups:
 
 - `methodology/`
 - `system/`
+
+## Skill Manifest
+
+Methodology skills:
+
+- `methodology/karpathy-guidelines`: keep code changes simple, scoped, assumption-aware, and verified.
+- `methodology/task-contract-and-leveling`: classify task risk, execution level, scope, verification, and human gates.
+- `methodology/context-engineering`: select the smallest useful repo context for a task.
+- `methodology/systematic-debugging`: diagnose by reproduction, evidence, root cause, minimal fix, and validation.
+- `methodology/verification-before-completion`: prevent false completion with fresh verification evidence.
+- `methodology/code-review-and-quality`: review diffs for correctness, regression risk, tests, and maintainability.
+- `methodology/skill-creator`: create or update local skills with concise metadata, provenance, and tests.
+
+System skills:
+
+- `system/cpp-linux-system-engineering`: cover C++ / Linux / backend / system engineering checks.
+- `system/security-review`: review auth, permissions, secrets, input parsing, IPC, network, filesystem, and subprocess risk.
+- `system/performance-analysis`: ground performance work in baseline and measurement evidence.
+
+## Provenance Policy
+
+Every skill declares `source`, `upstream`, `license`, and `adaptation_notes` in frontmatter.
+Third-party skills are adapted into local instruction-only templates.
+Do not copy third-party scripts, hooks, install commands, marketplace metadata, or project-specific workflow assumptions into this directory.
+
+## Role To Skill Routing
+
+These mappings guide large-mode subagent work.
+They do not make skills mandatory runtime dependencies.
+They do not bypass human gates.
+
+| Role | Use When Available | Recommended By Risk |
+| --- | --- | --- |
+| `planner` | `karpathy-guidelines`, `task-contract-and-leveling`, `context-engineering` | `security-review`, `performance-analysis`, `cpp-linux-system-engineering` |
+| `explorer` | `context-engineering`, `systematic-debugging` | `cpp-linux-system-engineering`, `performance-analysis`, `security-review` |
+| `implementer` | `karpathy-guidelines`, `cpp-linux-system-engineering`, `verification-before-completion` | `security-review`, `performance-analysis`, `context-engineering` |
+| `reviewer` | `code-review-and-quality`, `security-review`, `cpp-linux-system-engineering` | `systematic-debugging`, `performance-analysis`, `verification-before-completion` |
+| `evaluator` | `verification-before-completion`, `performance-analysis` | `systematic-debugging`, `context-engineering`, `code-review-and-quality` |
+
+If skills are unavailable, each role must follow `AGENTS.md`, `docs/ai/*`, and its `.codex/agents/*.md` role contract directly.
+
+Use `methodology/skill-creator` only when creating, consolidating, or reviewing `.agents/skills/*/SKILL.md` templates.

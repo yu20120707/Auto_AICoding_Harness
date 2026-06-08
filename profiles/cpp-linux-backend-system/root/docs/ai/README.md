@@ -12,6 +12,7 @@ Recommended reading by task type:
 - threads, atomics, lock order, shared state: `concurrency.md`
 - API, ABI, protocol, config compatibility: `api-abi.md`
 - performance and profiling changes: `performance.md`
+- logging, metrics, diagnostics, and operational readiness: `observability.md`
 - CMake and build graph changes: `cmake.md`
 - project build entrypoints and compile database notes: `build.md`
 - unit, integration, and regression expectations: `testing.md`

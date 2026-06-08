@@ -34,6 +34,7 @@ class CppProfileTemplatesIntegrationTest(unittest.TestCase):
                 "docs/ai/concurrency.md",
                 "docs/ai/api-abi.md",
                 "docs/ai/performance.md",
+                "docs/ai/observability.md",
                 "docs/ai/cmake.md",
                 "docs/ai/build.md",
                 "docs/ai/testing.md",
@@ -50,6 +51,7 @@ class CppProfileTemplatesIntegrationTest(unittest.TestCase):
             self.assertIn("atomic", (tmpdir / "docs/ai/concurrency.md").read_text(encoding="utf-8"))
             self.assertIn("ABI", (tmpdir / "docs/ai/api-abi.md").read_text(encoding="utf-8"))
             self.assertIn("baseline", (tmpdir / "docs/ai/performance.md").read_text(encoding="utf-8"))
+            self.assertIn("metrics", (tmpdir / "docs/ai/observability.md").read_text(encoding="utf-8"))
             self.assertIn("target_link_libraries", (tmpdir / "docs/ai/cmake.md").read_text(encoding="utf-8"))
             self.assertIn("compile_commands", (tmpdir / "docs/ai/build.md").read_text(encoding="utf-8"))
 
@@ -81,7 +83,7 @@ class CppProfileTemplatesIntegrationTest(unittest.TestCase):
         capabilities = (REPO_ROOT / "docs/design/current-capabilities.md").read_text(encoding="utf-8")
         combined = readme + "\n" + capabilities
 
-        self.assertIn("v1.0-phase10", combined)
+        self.assertIn("v1.3-skill-creator-zh-readme", combined)
         self.assertIn("cpp-linux-backend-system", combined)
         self.assertIn("No new CLI commands", combined)
 

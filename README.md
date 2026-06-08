@@ -40,15 +40,16 @@ It stores the rules, templates, prompts, scripts, and profile overlays used to i
 - [profiles/cpp-linux-backend-system/README.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/profiles/cpp-linux-backend-system/README.md)
 - [prompts/README.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/prompts/README.md)
 - [scripts/README.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/scripts/README.md)
+- [README.zh-CN.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/README.zh-CN.md)
 
 ## Current Status
 
-This repository currently implements the `v1.0-phase10` baseline.
+This repository currently implements the `v1.3-skill-creator-zh-readme` baseline.
 The audited design documents remain the contract source, and future-only capabilities are marked explicitly in `docs/design/`.
 
 ## Quick Start
 
-Phase 10 currently supports `ai-init small`, `ai-upgrade large`, `ai-status`, `ai-review diff`, `ai-review spec`, `ai-review plan`, `ai-review final`, `ai-approve spec`, `ai-approve plan`, `ai-approve diff`, `ai-approve final`, `ai-reject spec`, `ai-reject plan`, `ai-reject diff`, `ai-reject final`, `ai-context-pack`, and `ai-handoff`.
+Phase 13 currently supports `ai-init small`, `ai-upgrade large`, `ai-status`, `ai-review diff`, `ai-review spec`, `ai-review plan`, `ai-review final`, `ai-approve spec`, `ai-approve plan`, `ai-approve diff`, `ai-approve final`, `ai-reject spec`, `ai-reject plan`, `ai-reject diff`, `ai-reject final`, `ai-context-pack`, and `ai-handoff`.
 `context-pack` and `handoff` do not advance the review state machine.
 `ai-review spec` / `ai-review plan` / `ai-review final` generate review material and move state into the corresponding waiting gate only.
 The full human gate closure is currently supported for `spec`, `plan`, `diff`, and `final`.
@@ -56,7 +57,10 @@ Phase 7 strengthened the `cpp-linux-backend-system` profile and target-project `
 Phase 8 aligned the release baseline and usage docs.
 Phase 9 added optional subagent role templates for large mode.
 Phase 10 adds optional skills templates for large mode.
-No new CLI commands were added in Phase 10.
+Phase 11 strengthens the optional skills library and maps subagent roles to recommended local skills.
+Phase 12 consolidates skills into a smaller provenance-aware set adapted from selected high-quality upstream skills plus local C++/Linux system guidance.
+Phase 13 adds a local `skill-creator` template and a Chinese README.
+No new CLI commands were added in Phase 13.
 subagent execution and skills installation are intentionally not implemented yet.
 automatic third-party skill fetching is intentionally not implemented yet.
 `subagent` and `skills` remain enhancement layers, not hard dependencies.
@@ -65,6 +69,7 @@ small mode does not depend on skills.
 If subagents are unavailable, the main agent should follow the same role contracts sequentially.
 If skills are unavailable, the main agent should rely on `AGENTS.md` and `docs/ai/*` directly.
 skills are local project-level enhancement templates, not auto-installed or auto-executed features.
+skills declare provenance and adaptation notes; third-party scripts, hooks, marketplace metadata, and installers are not vendored.
 Python integration tests are the stable verification path for the current implementation baseline.
 
 ## Release Docs

@@ -20,6 +20,22 @@
 - risk list
 - fix recommendations
 
+## Skill Guidance
+
+Use when local skills are available:
+
+- `methodology/code-review-and-quality`
+- `methodology/verification-before-completion`
+- `system/cpp-linux-system-engineering`
+
+Recommended by risk:
+
+- `system/security-review` for trust boundaries, secrets, auth, or destructive operations
+- `system/performance-analysis` for performance claims
+- `methodology/systematic-debugging` for bug-fix diffs
+
+Skills are advisory local templates. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
+
 ## Prohibited
 
 - do not replace human approval

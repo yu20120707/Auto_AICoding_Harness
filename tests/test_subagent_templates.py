@@ -93,9 +93,30 @@ class SubagentTemplatesIntegrationTest(unittest.TestCase):
         capabilities = (REPO_ROOT / "docs/design/current-capabilities.md").read_text(encoding="utf-8")
         combined = readme + "\n" + capabilities
 
-        self.assertIn("v1.0-phase10", combined)
+        self.assertIn("v1.3-skill-creator-zh-readme", combined)
         self.assertIn("subagent role templates", combined)
         self.assertIn("subagent execution", combined)
+
+    def test_role_templates_reference_local_skill_guidance_without_hard_dependency(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
+            tmpdir = Path(tmp)
+            self.prepare_large(tmpdir)
+
+            expectations = {
+                "planner.md": ["karpathy-guidelines", "task-contract-and-leveling", "context-engineering"],
+                "explorer.md": ["context-engineering", "systematic-debugging"],
+                "implementer.md": ["karpathy-guidelines", "cpp-linux-system-engineering", "verification-before-completion"],
+                "reviewer.md": ["code-review-and-quality", "cpp-linux-system-engineering"],
+                "evaluator.md": ["verification-before-completion", "performance-analysis"],
+            }
+
+            for filename, skills in expectations.items():
+                content = (tmpdir / ".codex" / "agents" / filename).read_text(encoding="utf-8")
+                self.assertIn("Skill Guidance", content)
+                self.assertIn("Skills are advisory local templates", content)
+                self.assertIn("If skills are unavailable", content)
+                for skill in skills:
+                    self.assertIn(skill, content, filename)
 
 
 if __name__ == "__main__":

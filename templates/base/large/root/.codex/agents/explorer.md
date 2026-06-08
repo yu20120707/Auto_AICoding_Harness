@@ -22,6 +22,21 @@
 - call chain notes
 - risk notes
 
+## Skill Guidance
+
+Use when local skills are available:
+
+- `methodology/context-engineering`
+- `methodology/systematic-debugging`
+
+Recommended by risk:
+
+- `system/cpp-linux-system-engineering` for C++ / Linux / backend / system evidence
+- `system/performance-analysis` for performance-sensitive paths
+- `system/security-review` for trust boundaries, secrets, auth, or destructive operations
+
+Skills are advisory local templates. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
+
 ## Prohibited
 
 - do not refactor

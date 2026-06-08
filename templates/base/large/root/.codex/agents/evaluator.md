@@ -23,6 +23,22 @@
 - `.ai/handoff.md`
 - final verification summary
 
+## Skill Guidance
+
+Use when local skills are available:
+
+- `methodology/verification-before-completion`
+- `system/performance-analysis`
+
+Recommended by risk:
+
+- `methodology/systematic-debugging` for failed or flaky checks
+- `methodology/context-engineering` for incomplete evidence
+- `methodology/code-review-and-quality` for final review evidence gaps
+- `system/cpp-linux-system-engineering` for C++ / Linux / backend / system validation
+
+Skills are advisory local templates. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
+
 ## Prohibited
 
 - do not claim tests passed without evidence

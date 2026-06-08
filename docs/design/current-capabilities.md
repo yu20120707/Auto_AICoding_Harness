@@ -2,7 +2,7 @@
 
 ## Version Baseline
 
-`v1.0-phase10`
+`v1.3-skill-creator-zh-readme`
 
 ## Supported Commands
 
@@ -24,11 +24,16 @@
 - `ai-context-pack`
 - `ai-handoff`
 
-## Phase 10 Scope
+## Phase 13 Scope
 
 - keeps the Phase 8 release baseline and workflow behavior
 - keeps optional subagent role templates for large mode
-- adds optional local skills templates for large mode
+- consolidates optional local skills templates into a smaller provenance-aware set
+- adds a local `skill-creator` template for maintaining `.agents/skills/*/SKILL.md`
+- adds a Chinese `README.zh-CN.md`
+- adapts selected upstream skill ideas from karpathy-guidelines, obra/superpowers, addyosmani/agent-skills, and getsentry/skills
+- keeps local C++ / Linux / backend / system guidance in one profile-oriented skill
+- maps large-mode subagent roles to recommended local skills
 - keeps subagents as enhancement templates, not execution logic
 - keeps skills as local project-level enhancement templates, not installation logic
 - No new CLI commands
@@ -91,4 +96,4 @@ No third-party runtime dependencies.
 - `tests/test_cpp_profile_templates.py`: profile overlay docs generation, keyword coverage, and safe placeholder script content
 - `tests/test_e2e_workflow.py`: full mainline workflow from `UNINITIALIZED` to `DONE`
 - `tests/test_subagent_templates.py`: large-mode subagent role template generation, keyword coverage, and safe-write behavior
-- `tests/test_skill_templates.py`: large-mode local skills template generation, keyword coverage, and safe-write behavior
+- `tests/test_skill_templates.py`: consolidated local skills template generation, provenance coverage, subagent routing guidance, keyword coverage, and safe-write behavior

@@ -1,3 +1,12 @@
+---
+name: performance-analysis
+description: Ground performance changes in baseline, benchmark, profile evidence, P50/P95/P99, throughput, and resource use.
+source: adapted
+upstream: addyosmani/agent-skills performance and review patterns
+license: see-upstream
+adaptation_notes: Adapted for C++/Linux backend performance work and this profile's docs/ai/performance.md guidance.
+---
+
 # Performance Analysis
 
 ## Purpose

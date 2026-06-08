@@ -21,6 +21,22 @@
 - `.ai/scope.md`
 - `.ai/implementation-plan.md`
 
+## Skill Guidance
+
+Use when local skills are available:
+
+- `methodology/task-contract-and-leveling`
+- `methodology/karpathy-guidelines`
+- `methodology/context-engineering`
+
+Recommended by risk:
+
+- `system/cpp-linux-system-engineering` for C++ / Linux / backend / system impact
+- `system/performance-analysis` for latency, throughput, or resource claims
+- `system/security-review` for auth, permissions, secrets, IPC, parsing, or network boundaries
+
+Skills are advisory local templates. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
+
 ## Prohibited
 
 - do not implement code

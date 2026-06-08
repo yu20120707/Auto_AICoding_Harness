@@ -8,17 +8,17 @@ target-repo/
 ├── .agents/skills/
 │   ├── README.md
 │   ├── methodology/
-│   │   ├── design-before-code/SKILL.md
+│   │   ├── karpathy-guidelines/SKILL.md
+│   │   ├── task-contract-and-leveling/SKILL.md
+│   │   ├── context-engineering/SKILL.md
 │   │   ├── systematic-debugging/SKILL.md
+│   │   ├── code-review-and-quality/SKILL.md
 │   │   ├── verification-before-completion/SKILL.md
-│   │   └── human-in-loop-development/SKILL.md
+│   │   └── skill-creator/SKILL.md
 │   └── system/
-│       ├── cpp-system-dev/SKILL.md
-│       ├── linux-debug/SKILL.md
-│       ├── network-programming/SKILL.md
-│       ├── concurrency-review/SKILL.md
-│       ├── performance-analysis/SKILL.md
-│       └── cpp-api-abi-review/SKILL.md
+│       ├── cpp-linux-system-engineering/SKILL.md
+│       ├── security-review/SKILL.md
+│       └── performance-analysis/SKILL.md
 ├── .codex/agents/
 │   ├── README.md
 │   ├── planner.md
@@ -34,6 +34,7 @@ target-repo/
 │   ├── concurrency.md
 │   ├── api-abi.md
 │   ├── performance.md
+│   ├── observability.md
 │   ├── cmake.md
 │   ├── build.md
 │   └── testing.md
@@ -45,6 +46,7 @@ target-repo/
     ├── .gitkeep
     ├── templates/
     ├── state.json
+    ├── epic.md
     ├── spec.md
     ├── scope.md
     ├── implementation-plan.md
@@ -61,9 +63,9 @@ target-repo/
 ## When Files Appear
 
 - `ai-init small` creates the base repository structure: `AGENTS.md`, `docs/ai/`, `scripts/`, `.ai/state.json`, and `.ai/templates/`.
-- `ai-upgrade large` adds the richer `.ai/` planning and review scaffold such as `spec.md`, `scope.md`, `implementation-plan.md`, `affected-files.md`, `run-trace.md`, `evaluation.md`, `reviews/`, and `approvals/`.
+- `ai-upgrade large` adds the richer `.ai/` planning and review scaffold such as `epic.md`, `spec.md`, `scope.md`, `implementation-plan.md`, `affected-files.md`, `run-trace.md`, `evaluation.md`, `reviews/`, and `approvals/`.
 - `ai-upgrade large` also adds optional `.codex/agents/` role templates.
-- `ai-upgrade large` also adds optional `.agents/skills/` local templates.
+- `ai-upgrade large` also adds optional `.agents/skills/` local templates. The current consolidated set contains 10 provenance-aware skills.
 - `ai-context-pack` creates `.ai/context-pack.md`.
 - `ai-handoff` creates `.ai/handoff.md`.
 - `ai-review ...` creates files under `.ai/reviews/`.

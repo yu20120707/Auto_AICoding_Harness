@@ -21,6 +21,22 @@
 - updated tests
 - `.ai/verification.md`
 
+## Skill Guidance
+
+Use when local skills are available:
+
+- `methodology/karpathy-guidelines`
+- `methodology/verification-before-completion`
+- `system/cpp-linux-system-engineering`
+
+Recommended by risk:
+
+- `methodology/context-engineering` for unfamiliar code paths
+- `system/security-review` for auth, permissions, secrets, IPC, parsing, or network boundaries
+- `system/performance-analysis` for performance-sensitive code
+
+Skills are advisory local templates. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
+
 ## Prohibited
 
 - do not cross the approved scope

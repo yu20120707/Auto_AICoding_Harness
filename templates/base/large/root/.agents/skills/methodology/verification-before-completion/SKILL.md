@@ -1,3 +1,12 @@
+---
+name: verification-before-completion
+description: Prevent false completion by requiring build, test, check, or documented not-run evidence before final claims.
+source: adapted
+upstream: obra/superpowers skills/verification-before-completion
+license: see-upstream
+adaptation_notes: Adapted to this harness verification/evaluation files and target project scripts; no external commands added.
+---
+
 # Verification Before Completion
 
 ## Purpose
@@ -14,7 +23,8 @@ Before claiming task complete, before final review, and after implementation.
 
 ## Process
 
-Run or document build / test / check steps, record evidence, and note why anything was not run.
+Run or document build / test / check steps, record evidence, note why anything was not run, and distinguish "tests passed" from "not run".
+Use the freshest available command output for final claims.
 
 ## Output
 
