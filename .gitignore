@@ -1,0 +1,16 @@
+# Root live runtime directories are not product structure in this repository.
+/.ai/
+/.codex/
+/.agents/
+
+# Temporary outputs
+/tmp/
+/dist/
+/out/
+/logs/
+/generated/
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+

@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+from datetime import datetime
+from pathlib import Path
+import sys
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from core.state import write_state
+from core.template import materialize_templates
+
+
+DEFAULT_PROFILE = "cpp-linux-backend-system"
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Initialize a target repository with Auto_AICoding_harness.")
+    parser.add_argument("mode", choices=["small"])
+    parser.add_argument("--force", action="store_true", help="overwrite managed files after backing them up")
+    parser.add_argument(
+        "--profile",
+        default=DEFAULT_PROFILE,
+        help=f"profile overlay to apply (default: {DEFAULT_PROFILE})",
+    )
+    return parser.parse_args()
+
+
+def main() -> int:
+    try:
+        args = parse_args()
+        target_root = Path.cwd()
+        timestamp = datetime.now().astimezone().strftime("%Y%m%d-%H%M%S")
+
+        results = materialize_templates(
+            harness_root=REPO_ROOT,
+            target_root=target_root,
+            profile=args.profile,
+            force=args.force,
+            timestamp=timestamp,
+        )
+        results.append(
+            write_state(
+                target_root=target_root,
+                profile=args.profile,
+                force=args.force,
+                timestamp=timestamp,
+            )
+        )
+
+        for result in results:
+            line = f"{result.action} {result.path.relative_to(target_root).as_posix()}"
+            if result.backup_path is not None:
+                line += f" (backup: {result.backup_path.relative_to(target_root).as_posix()})"
+            print(line)
+
+        return 0
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

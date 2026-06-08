@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+import sys
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from core.state import STATE_RELATIVE_PATH, load_state
+
+
+def present(path: Path) -> str:
+    return "yes" if path.exists() else "no"
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Show target repository harness status.")
+    return parser.parse_args()
+
+
+def main() -> int:
+    try:
+        parse_args()
+        target_root = Path.cwd()
+        state = load_state(target_root)
+
+        if state is None:
+            print("initialized: no")
+            print("status: UNINITIALIZED")
+            print("mode: -")
+            print("profile: -")
+            print("current_gate: none")
+        else:
+            print("initialized: yes")
+            print(f"status: {state.get('status', 'UNKNOWN')}")
+            print(f"mode: {state.get('mode', '-')}")
+            print(f"profile: {state.get('profile', '-')}")
+            current_gate = state.get("current_gate")
+            print(f"current_gate: {current_gate if current_gate is not None else 'none'}")
+
+        print(f"AGENTS.md: {present(target_root / 'AGENTS.md')}")
+        print(f".ai/state.json: {present(target_root / STATE_RELATIVE_PATH)}")
+        print(f"docs/ai/: {present(target_root / 'docs' / 'ai')}")
+        print(f"scripts/ai_check.sh: {present(target_root / 'scripts' / 'ai_check.sh')}")
+        print(f"context_pack: {present(target_root / '.ai' / 'context-pack.md')}")
+        print(f"handoff: {present(target_root / '.ai' / 'handoff.md')}")
+        large_epic = target_root / ".ai" / "epic.md"
+        reviews_dir = target_root / ".ai" / "reviews"
+        approvals_dir = target_root / ".ai" / "approvals"
+        if (state and state.get("mode") == "large") or large_epic.exists() or reviews_dir.exists() or approvals_dir.exists():
+            print(f"large files: {'present' if large_epic.exists() else 'absent'}")
+            print(f"reviews dir: {'present' if reviews_dir.exists() else 'absent'}")
+            print(f"approvals dir: {'present' if approvals_dir.exists() else 'absent'}")
+        return 0
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
