@@ -28,9 +28,11 @@ Use when global skills are installed and available:
 - `methodology/task-contract-and-leveling`
 - `methodology/karpathy-guidelines`
 - `methodology/context-engineering`
+- `methodology/planning-and-task-breakdown`
 
 Recommended by risk:
 
+- `methodology/source-driven-development` for framework, library, or API-contract work that must follow official docs
 - `system/cpp-linux-system-engineering` for C++ / Linux / backend / system impact
 - `system/performance-analysis` for latency, throughput, or resource claims
 - `system/security-review` for auth, permissions, secrets, IPC, parsing, or network boundaries

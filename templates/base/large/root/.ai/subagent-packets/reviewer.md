@@ -12,6 +12,7 @@ Review the proposed diff or artifact for correctness, regressions, contract impa
 
 ## Optional Skills
 
+- `methodology/source-driven-development`
 - `system/security-review`
 - `system/performance-analysis`
 - `methodology/systematic-debugging`

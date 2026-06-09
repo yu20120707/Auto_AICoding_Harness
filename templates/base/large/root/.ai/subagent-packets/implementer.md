@@ -12,6 +12,8 @@ Make scoped changes that match the approved plan or task contract.
 
 ## Optional Skills
 
+- `methodology/test-driven-development`
+- `methodology/source-driven-development`
 - `methodology/context-engineering`
 - `system/security-review`
 - `system/performance-analysis`

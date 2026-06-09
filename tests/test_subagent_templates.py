@@ -174,9 +174,9 @@ class SubagentTemplatesIntegrationTest(unittest.TestCase):
             self.prepare_large(tmpdir)
 
             expectations = {
-                "planner.md": ["karpathy-guidelines", "task-contract-and-leveling", "context-engineering"],
+                "planner.md": ["karpathy-guidelines", "task-contract-and-leveling", "context-engineering", "planning-and-task-breakdown"],
                 "explorer.md": ["context-engineering", "systematic-debugging"],
-                "implementer.md": ["karpathy-guidelines", "cpp-linux-system-engineering", "verification-before-completion"],
+                "implementer.md": ["karpathy-guidelines", "cpp-linux-system-engineering", "verification-before-completion", "test-driven-development"],
                 "reviewer.md": ["code-review-and-quality", "cpp-linux-system-engineering"],
                 "evaluator.md": ["verification-before-completion", "performance-analysis"],
             }

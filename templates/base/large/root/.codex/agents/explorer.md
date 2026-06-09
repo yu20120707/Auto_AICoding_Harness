@@ -31,6 +31,7 @@ Use when global skills are installed and available:
 
 Recommended by risk:
 
+- `methodology/source-driven-development` for framework, library, or API investigation against official docs
 - `system/cpp-linux-system-engineering` for C++ / Linux / backend / system evidence
 - `system/performance-analysis` for performance-sensitive paths
 - `system/security-review` for trust boundaries, secrets, auth, or destructive operations

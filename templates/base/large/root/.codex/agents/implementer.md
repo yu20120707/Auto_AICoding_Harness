@@ -31,6 +31,8 @@ Use when global skills are installed and available:
 
 Recommended by risk:
 
+- `methodology/test-driven-development` for behavior-changing code paths or bug fixes
+- `methodology/source-driven-development` for framework or library APIs that must be verified from official docs
 - `methodology/context-engineering` for unfamiliar code paths
 - `system/security-review` for auth, permissions, secrets, IPC, parsing, or network boundaries
 - `system/performance-analysis` for performance-sensitive code

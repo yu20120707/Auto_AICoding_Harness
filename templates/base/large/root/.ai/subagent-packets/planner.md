@@ -9,9 +9,11 @@ Convert the user request into a bounded implementation plan, task level, risks, 
 - `methodology/task-contract-and-leveling`
 - `methodology/karpathy-guidelines`
 - `methodology/context-engineering`
+- `methodology/planning-and-task-breakdown`
 
 ## Optional Skills
 
+- `methodology/source-driven-development`
 - `system/cpp-linux-system-engineering`
 - `system/performance-analysis`
 - `system/security-review`

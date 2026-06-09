@@ -30,6 +30,7 @@ Use when global skills are installed and available:
 
 Recommended by risk:
 
+- `methodology/source-driven-development` for framework/API correctness against official docs
 - `system/security-review` for trust boundaries, secrets, auth, or destructive operations
 - `system/performance-analysis` for performance claims
 - `methodology/systematic-debugging` for bug-fix diffs

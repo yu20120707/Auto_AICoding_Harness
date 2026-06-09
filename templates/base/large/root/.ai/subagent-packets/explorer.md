@@ -11,6 +11,7 @@ Inspect the repository or subsystem and return evidence-backed context without c
 
 ## Optional Skills
 
+- `methodology/source-driven-development`
 - `system/cpp-linux-system-engineering`
 - `system/performance-analysis`
 - `system/security-review`

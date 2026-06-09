@@ -73,10 +73,13 @@ Auto_AICoding_Harness/
     │   ├── karpathy-guidelines/SKILL.md
     │   ├── task-router/SKILL.md
     │   ├── repo-onboarding-analysis/SKILL.md
+    │   ├── source-driven-development/SKILL.md
+    │   ├── planning-and-task-breakdown/SKILL.md
     │   ├── task-contract-and-leveling/SKILL.md
     │   ├── context-engineering/SKILL.md
     │   ├── systematic-debugging/SKILL.md
     │   ├── code-review-and-quality/SKILL.md
+    │   ├── test-driven-development/SKILL.md
     │   ├── verification-before-completion/SKILL.md
     │   └── skill-creator/SKILL.md
     └── system/
