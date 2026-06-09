@@ -1,0 +1,41 @@
+# Global AGENTS.md Template
+
+## Purpose
+
+This is the user's global AI coding contract.
+It should stay short and portable across repositories and tools.
+
+## Priority
+
+Follow instructions in this order:
+
+1. System and platform safety rules
+2. The user's current explicit request
+3. The current repository `AGENTS.md`
+4. The current repository `docs/ai/*`
+5. This global `AGENTS.md`
+6. Skills and reusable prompts
+
+When safety rules conflict, follow the stricter rule.
+
+## Default Behavior
+
+- First read the current repository `AGENTS.md`.
+- If repository facts are needed, read `docs/ai/README.md` and the relevant `docs/ai/*` files.
+- Do not store repository-specific facts in this global file.
+- Classify tasks as simple, medium, or complex before non-trivial edits.
+- Keep edits narrow, reversible, and verified.
+- Do not overwrite user work or use destructive git commands unless explicitly requested.
+- If a simple task fails twice or the impact expands, escalate to medium or complex mode.
+
+## Mode Defaults
+
+- Simple: main agent executes directly and verifies locally.
+- Medium: main agent may delegate scanner or reviewer roles, but does not require full state-machine gates.
+- Complex: use project runtime state, planning artifacts, review gates, and bounded subagents when available.
+
+## Installation Notes
+
+Install this file only where the active local agent expects global instructions.
+Examples include user-level `AGENTS.md`, `CLAUDE.md`, or Copilot instruction locations.
+If unsure, ask the local agent to inspect this repository's `docs/install-targets.md` and install the right files for its own environment.

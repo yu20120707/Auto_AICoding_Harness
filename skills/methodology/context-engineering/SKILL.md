@@ -4,7 +4,7 @@ description: Select the smallest useful repo context for a task, including relev
 source: adapted
 upstream: addyosmani/agent-skills skills/context-engineering
 license: see-upstream
-adaptation_notes: Condensed to the harness context model and safe for local project-level use; no external integrations included.
+adaptation_notes: Condensed to the harness context model and safe for repository-owned global use; no external integrations included.
 ---
 
 # Context Engineering

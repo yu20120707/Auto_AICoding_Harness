@@ -48,6 +48,9 @@ class AiUpgradeLargeIntegrationTest(unittest.TestCase):
                 ".ai/run-trace.md",
                 ".ai/reviews",
                 ".ai/approvals",
+                ".ai/subagent-packets/README.md",
+                ".ai/subagent-packets/planner.md",
+                ".ai/subagent-packets/reviewer.md",
             ]:
                 self.assertTrue((tmpdir / path).exists(), path)
 

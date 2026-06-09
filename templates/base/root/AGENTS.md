@@ -12,19 +12,20 @@ For non-trivial tasks, also read the relevant `docs/ai/*` files for the area you
 
 Always read active `.ai/` task files when they exist.
 
-For C++ / Linux / backend / system work, pay attention to:
-
-- ownership and lifetime
-- concurrency and lock scope
-- API / ABI compatibility
-- performance evidence
-- build and test validation
-
 ## Workflow
 
-- `small` and `large` share one workflow model
-- `small` requires `diff` and `final`
-- `large` requires `spec`, `plan`, `diff`, and `final`
+- Classify non-trivial tasks as simple, medium, or complex before editing.
+- `small` and `large` share one workflow model.
+- `small` is suitable for direct or medium-complexity work without full planning gates.
+- `large` is suitable for complex work that needs `spec`, `plan`, `diff`, and `final` gates.
+- If a simple task fails twice or the impact expands, escalate the execution level.
+
+## Knowledge Placement
+
+- `AGENTS.md` is the thin project entrypoint.
+- `docs/ai/*` stores durable project facts.
+- `.ai/*` stores current task runtime, state, reviews, approvals, and handoff artifacts.
+- Skills provide reusable methods when available, but they do not override this file.
 
 ## Safety
 

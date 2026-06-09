@@ -25,7 +25,7 @@
 
 ## Skill Guidance
 
-Use when local skills are available:
+Use when global skills are installed and available:
 
 - `methodology/verification-before-completion`
 - `system/performance-analysis`
@@ -37,7 +37,7 @@ Recommended by risk:
 - `methodology/code-review-and-quality` for final review evidence gaps
 - `system/cpp-linux-system-engineering` for C++ / Linux / backend / system validation
 
-Skills are advisory local templates. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
+Skills are globally installed advisory guidance. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
 
 ## Prohibited
 

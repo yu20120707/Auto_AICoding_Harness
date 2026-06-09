@@ -2,9 +2,10 @@
 
 ## Command Set
 
-The current implemented command set in `v0.8-release-baseline` is:
+The current implemented command set in `v1.6-subagent-packets` is:
 
 - `ai-init`
+- `ai-install-skills`
 - `ai-upgrade`
 - `ai-status`
 - `ai-review`
@@ -26,6 +27,16 @@ The following command names remain design-level only and are not implemented yet
 
 ## Responsibilities
 
+### `ai-install-skills`
+
+- installs all repository-owned skills from `skills/` into the user's global Codex skills directory as a Codex example installer
+- defaults to `$CODEX_HOME/skills` or `~/.codex/skills`
+- does not run during `git clone`
+- does not fetch third-party skills
+- does not install global `AGENTS.md`, Claude, Copilot, or generic-agent files
+- existing skills are skipped unless `--force` is passed
+- `--force` backs up overwritten skills under `skill-backups/<timestamp>/`
+
 ### `ai-init`
 
 - initializes a target repository with base harness content
@@ -36,6 +47,7 @@ The following command names remain design-level only and are not implemented yet
 
 - upgrades a target repository from a lower control strength to a higher one
 - default first upgrade path is `small -> large`
+- creates large-mode planning, review, approval, optional agent-role, and subagent packet skeletons
 - must not delete existing target-project files by default
 
 ### `ai-status`

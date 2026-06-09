@@ -4,7 +4,7 @@ description: Use when writing, reviewing, or refactoring code to keep changes si
 source: adapted
 upstream: forrestchang/andrej-karpathy-skills
 license: MIT
-adaptation_notes: Condensed for Auto_AICoding_Harness as a local project-level template; no scripts or installer logic included.
+adaptation_notes: Condensed for Auto_AICoding_Harness as a repository-owned global skill; no scripts or third-party installer logic included.
 ---
 
 # Karpathy Guidelines

@@ -12,6 +12,8 @@ Phase 8 adds release and usage documentation, not new runtime behavior.
 
 - `docs/`
 - `templates/`
+- `skills/`
+- `global/`
 - `profiles/`
 - `prompts/`
 - `scripts/`
@@ -20,10 +22,11 @@ Phase 8 adds release and usage documentation, not new runtime behavior.
 ### Generated into target projects
 
 - `AGENTS.md`
+- `CLAUDE.md`
+- `.github/copilot-instructions.md`
 - `docs/ai/**`
 - `.ai/**`
 - `.codex/**` when agent config templates are enabled
-- `.agents/**` when project-coupled skills are enabled
 
 ## Template Rule
 
@@ -63,7 +66,10 @@ Expected long-lived generated project content:
 - `AGENTS.md`
 - `docs/ai/**`
 - `.codex/agents/**` when the project adopts agent config
-- `.agents/skills/**` when those skills are project-coupled
+Global skills are not generated into target projects.
+They are installed explicitly from this repository's `skills/` directory into a tool-supported skill root.
+`bin/ai-install-skills` is the Codex example installer only.
+Other tools should follow `docs/install-targets.md` and `prompts/bootstrap-local-agent.md`.
 
 Expected ignored generated runtime content:
 
@@ -71,6 +77,7 @@ Expected ignored generated runtime content:
 - `.ai/run-trace*`
 - `.ai/reviews/**`
 - `.ai/approvals/**`
+- `.ai/subagent-packets/**`
 - `.ai/backups/**`
 - `.ai/tmp/**`
 - `.ai/context-pack.md`

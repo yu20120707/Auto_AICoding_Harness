@@ -22,7 +22,7 @@
 
 ## Skill Guidance
 
-Use when local skills are available:
+Use when global skills are installed and available:
 
 - `methodology/code-review-and-quality`
 - `methodology/verification-before-completion`
@@ -34,7 +34,7 @@ Recommended by risk:
 - `system/performance-analysis` for performance claims
 - `methodology/systematic-debugging` for bug-fix diffs
 
-Skills are advisory local templates. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
+Skills are globally installed advisory guidance. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
 
 ## Prohibited
 

@@ -3,7 +3,7 @@
 ## Positioning
 
 - Repository name: `Auto_AICoding_harness`
-- Primary identity: `Codex-only AI Coding Harness`
+- Primary identity: `Codex-first, multi-agent-compatible AI Coding Harness`
 - First shipping profile: `cpp-linux-backend-system`
 - Intended user: ourselves
 
@@ -17,6 +17,9 @@ The system is split into:
 - `core`: workflow contract layer
 - `profile`: engineering policy layer
 - `templates`: only source of generated target-project files
+- `skills`: portable repository-owned skill source
+- `global`: user-level instruction templates
+- `prompts`: one-time local-agent setup prompts
 
 ## Core Owns
 
@@ -62,7 +65,8 @@ The system is split into:
 ## Subagent and Skill Position
 
 - `subagent` is a `large`-mode acceleration layer
-- `skills` are acceleration layers
+- `skills` are repository-owned portable guidance installed explicitly by the active local agent
+- `.ai/subagent-packets/` is the large-mode prompt/context protocol for bounded role delegation
 - neither is a correctness dependency
 - absence of either must fall back to the same artifacts and gate semantics
 
@@ -72,8 +76,10 @@ In generated target projects:
 
 - `docs/ai/` = long-lived project knowledge
 - `.ai/` = task runtime
-- `.codex/agents/` = project agent config when enabled
-- `.agents/skills/` = project skill config when enabled
+- `.codex/agents/` = optional project agent config when enabled
+- `.github/copilot-instructions.md` = lightweight Copilot trigger instructions
+- `CLAUDE.md` = optional Claude-compatible shim to `AGENTS.md`
+Global skills live outside target projects or in a supported project skill directory chosen by the active local agent.
 
 In this harness repository:
 
@@ -98,5 +104,5 @@ The original stable baseline shipped in this repository was:
 - template-source skeleton
 - initial `cpp-linux-backend-system` profile scaffold
 
-The current implementation baseline is `v0.7-phase6b`.
+The current implementation baseline is `v1.6-subagent-packets`.
 Actual command implementation should conform to the adjacent contract documents, with future-only capabilities marked explicitly as not implemented.

@@ -23,7 +23,7 @@
 
 ## Skill Guidance
 
-Use when local skills are available:
+Use when global skills are installed and available:
 
 - `methodology/karpathy-guidelines`
 - `methodology/verification-before-completion`
@@ -35,7 +35,7 @@ Recommended by risk:
 - `system/security-review` for auth, permissions, secrets, IPC, parsing, or network boundaries
 - `system/performance-analysis` for performance-sensitive code
 
-Skills are advisory local templates. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
+Skills are globally installed advisory guidance. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
 
 ## Prohibited
 

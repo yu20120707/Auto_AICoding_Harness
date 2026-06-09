@@ -40,6 +40,21 @@ class SubagentTemplatesIntegrationTest(unittest.TestCase):
             ]:
                 self.assertTrue((tmpdir / path).exists(), path)
 
+    def test_large_mode_generates_subagent_packet_templates(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
+            tmpdir = Path(tmp)
+            self.prepare_large(tmpdir)
+
+            for path in [
+                ".ai/subagent-packets/README.md",
+                ".ai/subagent-packets/planner.md",
+                ".ai/subagent-packets/explorer.md",
+                ".ai/subagent-packets/implementer.md",
+                ".ai/subagent-packets/reviewer.md",
+                ".ai/subagent-packets/evaluator.md",
+            ]:
+                self.assertTrue((tmpdir / path).exists(), path)
+
     def test_role_templates_contain_key_terms(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             tmpdir = Path(tmp)
@@ -60,6 +75,24 @@ class SubagentTemplatesIntegrationTest(unittest.TestCase):
             readme_text = (tmpdir / ".codex/agents/README.md").read_text(encoding="utf-8").lower()
             self.assertTrue("optional" in readme_text or "enhancement" in readme_text)
 
+    def test_packet_templates_contain_context_and_skill_terms(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
+            tmpdir = Path(tmp)
+            self.prepare_large(tmpdir)
+
+            expectations = {
+                "planner.md": ["Required Context", "task-contract-and-leveling", "Return Format"],
+                "explorer.md": ["Required Context", "context-engineering", "Stop Conditions"],
+                "implementer.md": ["Forbidden Actions", "verification-before-completion", "cpp-linux-system-engineering"],
+                "reviewer.md": ["Expected Output", "code-review-and-quality", "verification_gaps"],
+                "evaluator.md": ["recommended_final_claim", "verification-before-completion", "performance-analysis"],
+            }
+
+            for filename, terms in expectations.items():
+                content = (tmpdir / ".ai" / "subagent-packets" / filename).read_text(encoding="utf-8")
+                for term in terms:
+                    self.assertIn(term, content, filename)
+
     def test_default_does_not_overwrite(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             tmpdir = Path(tmp)
@@ -73,6 +106,19 @@ class SubagentTemplatesIntegrationTest(unittest.TestCase):
             self.assertIn("SKIPPED .codex/agents/planner.md", result.stdout)
             self.assertEqual(planner.read_text(encoding="utf-8"), "user modified\n")
 
+    def test_packet_templates_default_do_not_overwrite(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
+            tmpdir = Path(tmp)
+            self.prepare_large(tmpdir)
+            packet = tmpdir / ".ai" / "subagent-packets" / "planner.md"
+            packet.write_text("user modified\n", encoding="utf-8")
+
+            result = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-upgrade"), "large")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("ALREADY_LARGE", result.stdout)
+            self.assertIn("SKIPPED .ai/subagent-packets/planner.md", result.stdout)
+            self.assertEqual(packet.read_text(encoding="utf-8"), "user modified\n")
+
     def test_force_backs_up_and_overwrites(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             tmpdir = Path(tmp)
@@ -84,20 +130,45 @@ class SubagentTemplatesIntegrationTest(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("OVERWRITTEN .codex/agents/reviewer.md", result.stdout)
 
-            backups = list((tmpdir / ".ai" / "backups").rglob("reviewer.md"))
+            backups = [
+                path
+                for path in (tmpdir / ".ai" / "backups").rglob("reviewer.md")
+                if ".codex" in path.parts and "agents" in path.parts
+            ]
             self.assertTrue(backups, "expected reviewer template backup")
             self.assertIn("user modified", backups[0].read_text(encoding="utf-8"))
+
+    def test_packet_force_backs_up_and_overwrites(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
+            tmpdir = Path(tmp)
+            self.prepare_large(tmpdir)
+            packet = tmpdir / ".ai" / "subagent-packets" / "reviewer.md"
+            packet.write_text("user modified\n", encoding="utf-8")
+
+            result = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-upgrade"), "large", "--force")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("OVERWRITTEN .ai/subagent-packets/reviewer.md", result.stdout)
+
+            backups = [
+                path
+                for path in (tmpdir / ".ai" / "backups").rglob("reviewer.md")
+                if "subagent-packets" in path.parts
+            ]
+            self.assertTrue(backups, "expected packet backup")
+            self.assertIn("user modified", backups[0].read_text(encoding="utf-8"))
+            self.assertIn("Reviewer Packet", packet.read_text(encoding="utf-8"))
 
     def test_current_capabilities_are_synced(self) -> None:
         readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
         capabilities = (REPO_ROOT / "docs/design/current-capabilities.md").read_text(encoding="utf-8")
         combined = readme + "\n" + capabilities
 
-        self.assertIn("v1.3-skill-creator-zh-readme", combined)
+        self.assertIn("v1.6-subagent-packets", combined)
         self.assertIn("subagent role templates", combined)
+        self.assertIn("subagent task packet", combined)
         self.assertIn("subagent execution", combined)
 
-    def test_role_templates_reference_local_skill_guidance_without_hard_dependency(self) -> None:
+    def test_role_templates_reference_global_skill_guidance_without_hard_dependency(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             tmpdir = Path(tmp)
             self.prepare_large(tmpdir)
@@ -113,7 +184,7 @@ class SubagentTemplatesIntegrationTest(unittest.TestCase):
             for filename, skills in expectations.items():
                 content = (tmpdir / ".codex" / "agents" / filename).read_text(encoding="utf-8")
                 self.assertIn("Skill Guidance", content)
-                self.assertIn("Skills are advisory local templates", content)
+                self.assertIn("Skills are globally installed advisory guidance", content)
                 self.assertIn("If skills are unavailable", content)
                 for skill in skills:
                     self.assertIn(skill, content, filename)

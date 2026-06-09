@@ -24,7 +24,7 @@
 
 ## Skill Guidance
 
-Use when local skills are available:
+Use when global skills are installed and available:
 
 - `methodology/context-engineering`
 - `methodology/systematic-debugging`
@@ -35,7 +35,7 @@ Recommended by risk:
 - `system/performance-analysis` for performance-sensitive paths
 - `system/security-review` for trust boundaries, secrets, auth, or destructive operations
 
-Skills are advisory local templates. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
+Skills are globally installed advisory guidance. If skills are unavailable, follow this role contract plus `AGENTS.md` and `docs/ai/*` directly.
 
 ## Prohibited
 

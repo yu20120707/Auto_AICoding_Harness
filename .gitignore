@@ -9,8 +9,9 @@
 /out/
 /logs/
 /generated/
+__pycache__/
+*.pyc
 
 # Editor and OS noise
 .DS_Store
 Thumbs.db
-

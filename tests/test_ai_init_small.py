@@ -41,6 +41,8 @@ class AiInitSmallIntegrationTest(unittest.TestCase):
 
             expected_paths = [
                 "AGENTS.md",
+                "CLAUDE.md",
+                ".github/copilot-instructions.md",
                 "docs/ai",
                 ".ai/.gitkeep",
                 ".ai/templates",
@@ -105,6 +107,27 @@ class AiInitSmallIntegrationTest(unittest.TestCase):
             self.assertTrue(backups, "expected AGENTS.md backup")
             self.assertIn("user modified", backups[0].read_text(encoding="utf-8"))
             self.assertIn("Project Type", agents_path.read_text(encoding="utf-8"))
+
+    def test_generated_agent_instruction_files_are_safe_write_managed(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
+            tmpdir = Path(tmp)
+            first = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-init"), "small")
+            self.assertEqual(first.returncode, 0, first.stderr)
+
+            copilot_path = tmpdir / ".github" / "copilot-instructions.md"
+            copilot_path.write_text("user modified\n", encoding="utf-8")
+
+            second = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-init"), "small")
+            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertIn("SKIPPED .github/copilot-instructions.md", second.stdout)
+            self.assertEqual(copilot_path.read_text(encoding="utf-8"), "user modified\n")
+
+            forced = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-init"), "small", "--force")
+            self.assertEqual(forced.returncode, 0, forced.stderr)
+            self.assertIn("OVERWRITTEN .github/copilot-instructions.md", forced.stdout)
+            backups = list((tmpdir / ".ai" / "backups").rglob("copilot-instructions.md"))
+            self.assertTrue(backups, "expected Copilot instructions backup")
+            self.assertIn("user modified", backups[0].read_text(encoding="utf-8"))
 
     def test_ai_status_after_init(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:

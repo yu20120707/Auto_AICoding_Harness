@@ -83,9 +83,9 @@ class CppProfileTemplatesIntegrationTest(unittest.TestCase):
         capabilities = (REPO_ROOT / "docs/design/current-capabilities.md").read_text(encoding="utf-8")
         combined = readme + "\n" + capabilities
 
-        self.assertIn("v1.3-skill-creator-zh-readme", combined)
+        self.assertIn("v1.6-subagent-packets", combined)
         self.assertIn("cpp-linux-backend-system", combined)
-        self.assertIn("No new CLI commands", combined)
+        self.assertIn("ai-install-skills", combined)
 
 
 if __name__ == "__main__":

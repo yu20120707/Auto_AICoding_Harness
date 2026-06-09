@@ -2,10 +2,11 @@
 
 ## Version Baseline
 
-`v1.3-skill-creator-zh-readme`
+`v1.6-subagent-packets`
 
 ## Supported Commands
 
+- `ai-install-skills`
 - `ai-init small`
 - `ai-upgrade large`
 - `ai-status`
@@ -24,23 +25,42 @@
 - `ai-context-pack`
 - `ai-handoff`
 
-## Phase 13 Scope
+## Phase 16 Scope
 
 - keeps the Phase 8 release baseline and workflow behavior
 - keeps optional subagent role templates for large mode
-- consolidates optional local skills templates into a smaller provenance-aware set
-- adds a local `skill-creator` template for maintaining `.agents/skills/*/SKILL.md`
-- adds a Chinese `README.zh-CN.md`
+- keeps the consolidated provenance-aware skill set
+- keeps skills in repository-level `skills/` as portable skill sources
+- keeps `ai-install-skills` as a Codex example installer into `$CODEX_HOME/skills` or `~/.codex/skills`
+- supports `--force` install refresh with backup under `skill-backups/<timestamp>/`
+- keeps `skill-creator` for maintaining `skills/**/SKILL.md`
+- keeps a single Chinese `README.md`
+- adds `global/AGENTS.md.template` for user-level behavior guidance
+- adds `prompts/bootstrap-local-agent.md` for local-agent self-install guidance
+- adds `docs/install-targets.md`
+- adds `docs/design/platform-adapters.md`
+- adds `docs/design/task-levels-and-delegation.md`
+- adds `docs/design/subagent-packets.md`
+- adds `repo-onboarding-analysis` and `task-router` skills
 - adapts selected upstream skill ideas from karpathy-guidelines, obra/superpowers, addyosmani/agent-skills, and getsentry/skills
 - keeps local C++ / Linux / backend / system guidance in one profile-oriented skill
-- maps large-mode subagent roles to recommended local skills
+- maps large-mode subagent roles to recommended global skills
+- adds large-mode `.ai/subagent-packets/` templates for role-specific context passing
 - keeps subagents as enhancement templates, not execution logic
-- keeps skills as local project-level enhancement templates, not installation logic
-- No new CLI commands
+- keeps subagent task packets as prompt/context artifacts, not an automatic runner
+- small mode does not depend on subagents
+- small mode does not depend on skills at command runtime
+- If subagents are unavailable, the main agent should follow the same role contracts sequentially
+- If skills are not installed, the main agent should rely on `AGENTS.md` and `docs/ai/*` directly
+- does not automatically install skills or global instructions during `git clone`
+- does not fetch third-party skills during installation
 
 ## Supported Workflow
 
 ```text
+ai-install-skills
+  -> installs repository-owned skills into Codex as an example installer
+
 ai-init small
   -> ai-upgrade large
   -> ai-review spec
@@ -75,9 +95,9 @@ ai-init small
 ## Explicitly Not Implemented
 
 - subagent execution
-- skills installation
 - automatic third-party skill fetching
 - multi-profile marketplace
+- heavy platform adapter framework
 
 ## Dependency Policy
 
@@ -96,4 +116,4 @@ No third-party runtime dependencies.
 - `tests/test_cpp_profile_templates.py`: profile overlay docs generation, keyword coverage, and safe placeholder script content
 - `tests/test_e2e_workflow.py`: full mainline workflow from `UNINITIALIZED` to `DONE`
 - `tests/test_subagent_templates.py`: large-mode subagent role template generation, keyword coverage, and safe-write behavior
-- `tests/test_skill_templates.py`: consolidated local skills template generation, provenance coverage, subagent routing guidance, keyword coverage, and safe-write behavior
+- `tests/test_skill_templates.py`: portable skill source validation, install behavior, backup behavior, provenance coverage, onboarding/routing skills, subagent routing guidance, and keyword coverage

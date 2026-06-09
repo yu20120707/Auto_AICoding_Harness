@@ -1,177 +1,191 @@
-# Auto_AICoding_harness
+# Auto_AICoding_Harness
 
-`Auto_AICoding_harness` is a `Codex-only AI Coding Harness` source repository.
-It is optimized for our own `C++ / Linux / backend / system engineering` workflow.
+面向本地 AI Coding Agent 的工程工作流脚手架。
 
-This repository is not a target project runtime.
-It stores the rules, templates, prompts, scripts, and profile overlays used to inject a stable Codex workflow into other repositories.
+这个仓库不是业务项目，而是一个 Harness 源仓库：它提供命令、模板、skills、全局指令样板和设计文档，用来把稳定的 AI Coding 流程注入到其他目标项目中。
 
-## Scope
+当前优先服务我们自己的 `C++ / Linux / 后端 / 系统工程` 场景。
 
-- `core` concerns: workflow contracts, mode switching, review gates, state semantics, handoff, context packaging, and safe file-write policy.
-- `profile` concerns: `cpp-linux-backend-system` engineering policy, checklists, prompts, and target-project overlays.
-- `templates/` is the single source of truth for generated target-project files.
+## 适合什么
 
-## Non-goals
+- 给 Codex / Claude Code / GitHub Copilot 等本地 agent 提供统一项目入口。
+- 在目标项目中生成 `AGENTS.md`、`docs/ai/`、`.ai/`、检查脚本和 review gate 骨架。
+- 把常用 AI coding 方法论沉淀成全局 skills。
+- 根据任务复杂度在轻量流程和 large mode 流程之间切换。
 
-- Do not treat this repository as a live `.ai/` runtime.
-- Do not store target-project task state here.
-- Do not couple core contracts to `cmake`, `ctest`, or other profile-specific tooling.
-- Do not optimize for generic public compatibility over our own workflow stability.
+## 不做什么
 
-## Design Rules
+- 不自动接管业务源码。
+- 不在 `git clone` 时写入用户全局配置。
+- 不自动拉取第三方 skills。
+- 不实现自动 subagent runner。
+- 不把 CMake、ctest、clang-tidy 等 profile 策略硬编码进 core。
 
-- `core` owns process contracts, not language or build-system policy.
-- `profile` owns engineering policy, not process control.
-- `small` and `large` are different control strengths on one workflow, not two different systems.
-- `subagent` and `skills` are acceleration layers, never correctness dependencies.
-- Target-project long-lived knowledge lives in `docs/ai/`; target-project task runtime lives in `.ai/`.
-- Default file policy is `SKIPPED`; overwrite requires `--force` and per-file backup.
+## 快速开始
 
-## Repository Layout
-
-- [AGENTS.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/AGENTS.md)
-- [docs/design/reviewed-final-design-v1.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/docs/design/reviewed-final-design-v1.md)
-- [docs/design/current-capabilities.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/docs/design/current-capabilities.md)
-- [docs/design/command-contracts.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/docs/design/command-contracts.md)
-- [docs/design/state-machine.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/docs/design/state-machine.md)
-- [docs/design/repo-boundaries.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/docs/design/repo-boundaries.md)
-- [templates/README.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/templates/README.md)
-- [profiles/cpp-linux-backend-system/README.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/profiles/cpp-linux-backend-system/README.md)
-- [prompts/README.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/prompts/README.md)
-- [scripts/README.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/scripts/README.md)
-- [README.zh-CN.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/README.zh-CN.md)
-
-## Current Status
-
-This repository currently implements the `v1.3-skill-creator-zh-readme` baseline.
-The audited design documents remain the contract source, and future-only capabilities are marked explicitly in `docs/design/`.
-
-## Quick Start
-
-Phase 13 currently supports `ai-init small`, `ai-upgrade large`, `ai-status`, `ai-review diff`, `ai-review spec`, `ai-review plan`, `ai-review final`, `ai-approve spec`, `ai-approve plan`, `ai-approve diff`, `ai-approve final`, `ai-reject spec`, `ai-reject plan`, `ai-reject diff`, `ai-reject final`, `ai-context-pack`, and `ai-handoff`.
-`context-pack` and `handoff` do not advance the review state machine.
-`ai-review spec` / `ai-review plan` / `ai-review final` generate review material and move state into the corresponding waiting gate only.
-The full human gate closure is currently supported for `spec`, `plan`, `diff`, and `final`.
-Phase 7 strengthened the `cpp-linux-backend-system` profile and target-project `docs/ai` plus script templates.
-Phase 8 aligned the release baseline and usage docs.
-Phase 9 added optional subagent role templates for large mode.
-Phase 10 adds optional skills templates for large mode.
-Phase 11 strengthens the optional skills library and maps subagent roles to recommended local skills.
-Phase 12 consolidates skills into a smaller provenance-aware set adapted from selected high-quality upstream skills plus local C++/Linux system guidance.
-Phase 13 adds a local `skill-creator` template and a Chinese README.
-No new CLI commands were added in Phase 13.
-subagent execution and skills installation are intentionally not implemented yet.
-automatic third-party skill fetching is intentionally not implemented yet.
-`subagent` and `skills` remain enhancement layers, not hard dependencies.
-small mode does not depend on subagents.
-small mode does not depend on skills.
-If subagents are unavailable, the main agent should follow the same role contracts sequentially.
-If skills are unavailable, the main agent should rely on `AGENTS.md` and `docs/ai/*` directly.
-skills are local project-level enhancement templates, not auto-installed or auto-executed features.
-skills declare provenance and adaptation notes; third-party scripts, hooks, marketplace metadata, and installers are not vendored.
-Python integration tests are the stable verification path for the current implementation baseline.
-
-## Release Docs
-
-- [docs/release/v0.8-release-checklist.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/docs/release/v0.8-release-checklist.md)
-- [docs/usage/walkthrough.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/docs/usage/walkthrough.md)
-- [docs/usage/generated-target-structure.md](/C:/Users/26561/Documents/Auto_AICoding_Harness/docs/usage/generated-target-structure.md)
-
-### Windows
-
-Use `py` from the repository root:
+Windows:
 
 ```powershell
 py bin/ai-status
+py bin/ai-install-skills
 py bin/ai-init small
 py bin/ai-upgrade large
-py bin/ai-review diff
-py bin/ai-review spec
-py bin/ai-review plan
-py bin/ai-review final
-py bin/ai-approve spec
-py bin/ai-approve plan
-py bin/ai-approve diff
-py bin/ai-approve final
-py bin/ai-reject spec
-py bin/ai-reject plan
-py bin/ai-reject diff
-py bin/ai-reject final
-py bin/ai-context-pack
-py bin/ai-handoff
-py bin/ai-init small --force
 ```
 
-Run Python regression tests without requiring `bash`:
-
-```powershell
-py -m compileall bin core
-py tests/test_ai_init_small.py
-py tests/test_ai_upgrade_large.py
-py tests/test_ai_review_diff.py
-py tests/test_ai_approve_reject_diff.py
-py tests/test_ai_context_handoff.py
-py tests/test_current_capabilities.py
-py tests/test_ai_review_spec_plan_final.py
-py tests/test_ai_approve_reject_all_gates.py
-py tests/test_cpp_profile_templates.py
-py tests/test_e2e_workflow.py
-py tests/test_subagent_templates.py
-py tests/test_skill_templates.py
-```
-
-### Unix-like
-
-Use `python3` from the repository root:
+类 Unix:
 
 ```bash
 python3 bin/ai-status
+python3 bin/ai-install-skills
 python3 bin/ai-init small
 python3 bin/ai-upgrade large
-python3 bin/ai-review diff
-python3 bin/ai-review spec
-python3 bin/ai-review plan
-python3 bin/ai-review final
-python3 bin/ai-approve spec
-python3 bin/ai-approve plan
-python3 bin/ai-approve diff
-python3 bin/ai-approve final
-python3 bin/ai-reject spec
-python3 bin/ai-reject plan
-python3 bin/ai-reject diff
-python3 bin/ai-reject final
-python3 bin/ai-context-pack
-python3 bin/ai-handoff
-python3 bin/ai-init small --force
 ```
 
-If the scripts have execute permission, you can also run:
+如果脚本有执行权限，也可以直接运行：
 
 ```bash
 bin/ai-status
 bin/ai-init small
 ```
 
-Run regression checks with:
+## 推荐使用流程
 
-```bash
-python3 -m compileall bin core
-python3 tests/test_ai_init_small.py
-python3 tests/test_ai_upgrade_large.py
-python3 tests/test_ai_review_diff.py
-python3 tests/test_ai_approve_reject_diff.py
-python3 tests/test_ai_context_handoff.py
-python3 tests/test_current_capabilities.py
-python3 tests/test_ai_review_spec_plan_final.py
-python3 tests/test_ai_approve_reject_all_gates.py
-python3 tests/test_cpp_profile_templates.py
-python3 tests/test_e2e_workflow.py
-python3 tests/test_subagent_templates.py
-python3 tests/test_skill_templates.py
+1. 拉取本仓库。
+2. 让本地 agent 阅读 `README.md`、`AGENTS.md`、`docs/install-targets.md` 和 `prompts/bootstrap-local-agent.md`。
+3. 执行 `ai-install-skills`，把仓库内 skills 安装到当前 agent 支持的位置。
+4. 在目标项目根目录执行 `ai-init small`。
+5. 普通任务保持 small mode。
+6. 复杂任务执行 `ai-upgrade large`，启用 spec / plan / review / approval / handoff 骨架。
+7. 用 `ai-status` 查看当前状态。
+
+## 当前能力
+
+当前基线：`v1.6-subagent-packets`。
+
+已实现命令：
+
+- `ai-install-skills`
+- `ai-init small`
+- `ai-upgrade large`
+- `ai-status`
+- `ai-review spec / plan / diff / final`
+- `ai-approve spec / plan / diff / final`
+- `ai-reject spec / plan / diff / final`
+- `ai-context-pack`
+- `ai-handoff`
+
+仍未实现：
+
+- subagent execution
+- automatic third-party skill fetching
+- multi-profile marketplace
+- formal packaging / release CLI
+
+## 生成到目标项目的内容
+
+`ai-init small` 生成：
+
+- `AGENTS.md`
+- `CLAUDE.md`
+- `.github/copilot-instructions.md`
+- `docs/ai/`
+- `scripts/ai_build.sh`
+- `scripts/ai_test.sh`
+- `scripts/ai_check.sh`
+- `.ai/state.json`
+- `.ai/templates/`
+
+`ai-upgrade large` 追加：
+
+- `.ai/epic.md`
+- `.ai/spec.md`
+- `.ai/scope.md`
+- `.ai/implementation-plan.md`
+- `.ai/affected-files.md`
+- `.ai/run-trace.md`
+- `.ai/evaluation.md`
+- `.ai/reviews/`
+- `.ai/approvals/`
+- `.ai/subagent-packets/`
+- `.codex/agents/`
+
+`.ai/subagent-packets/` 是角色任务包模板，用来把任务目标、上下文、建议 skills、禁止事项和返回格式传给本地 agent 或 subagent。它不是自动执行器。
+
+## Skills
+
+仓库级 skills 位于 `skills/`，不会自动生成到目标项目。
+
+当前分类：
+
+- `skills/methodology/`：任务分级、上下文工程、调试、review、验证、skill 创建等方法论。
+- `skills/system/`：C++ / Linux / 系统工程、安全 review、性能分析。
+
+安装到 Codex 示例位置：
+
+```powershell
+py bin/ai-install-skills
+py bin/ai-install-skills --force
 ```
 
-### Shell Test
+其他 agent 的安装位置参考 `docs/install-targets.md`。
 
-The repository also keeps [tests/test_ai_init_small.sh](/C:/Users/26561/Documents/Auto_AICoding_Harness/tests/test_ai_init_small.sh).
-On Windows systems without a working `bash` or `sh`, prefer the Python regression test above.
+## 仓库结构
+
+- `bin/`：用户直接执行的命令入口。
+- `core/`：safe write、模板展开、state、review、approval、context、skill install 等公共逻辑。
+- `templates/`：生成目标项目文件的唯一模板源。
+- `profiles/`：profile overlay，目前主 profile 是 `cpp-linux-backend-system`。
+- `skills/`：仓库维护的可移植 skill 源。
+- `global/`：全局指令模板，例如 `AGENTS.md.template`。
+- `prompts/`：一次性 bootstrap 或 handoff prompt。
+- `docs/design/`：命令契约、状态机、repo 边界和 workflow 设计。
+- `docs/usage/`：生成结构和使用 walkthrough。
+- `tests/`：Python 集成测试和保留的 shell 测试。
+
+## 验证
+
+Windows:
+
+```powershell
+py -m compileall bin core
+py tests/test_ai_init_small.py
+py tests/test_ai_upgrade_large.py
+py tests/test_current_capabilities.py
+py tests/test_subagent_templates.py
+py tests/test_skill_templates.py
+```
+
+完整回归还包括：
+
+```powershell
+py tests/test_ai_review_diff.py
+py tests/test_ai_review_spec_plan_final.py
+py tests/test_ai_approve_reject_diff.py
+py tests/test_ai_approve_reject_all_gates.py
+py tests/test_ai_context_handoff.py
+py tests/test_cpp_profile_templates.py
+py tests/test_e2e_workflow.py
+```
+
+无 bash 的 Windows 环境优先运行 Python 测试。Shell 测试仍保留在 `tests/test_ai_init_small.sh`。
+
+## 关键文档
+
+- `AGENTS.md`
+- `docs/design/current-capabilities.md`
+- `docs/design/reviewed-final-design-v1.md`
+- `docs/design/command-contracts.md`
+- `docs/design/state-machine.md`
+- `docs/design/repo-boundaries.md`
+- `docs/design/subagent-packets.md`
+- `docs/install-targets.md`
+- `docs/usage/generated-target-structure.md`
+- `skills/README.md`
+
+## 安全边界
+
+- 默认不覆盖已有文件。
+- 只有 `--force` 才会覆盖，并且先备份到 `.ai/backups/<timestamp>/`。
+- 不创建业务源码目录，例如 `src/`、`include/`、`tests/`。
+- 不写入 API key、token、secret。
+- 不安装系统依赖。
