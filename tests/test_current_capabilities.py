@@ -19,6 +19,7 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
             "ai-init",
             "ai-upgrade",
             "ai-status",
+            "ai-state",
             "ai-review",
             "ai-approve",
             "ai-reject",
@@ -40,6 +41,7 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
             "ai-init small",
             "ai-upgrade large",
             "ai-status",
+            "ai-state",
             "ai-review spec / plan / diff / final",
             "ai-approve spec / plan / diff / final",
             "ai-reject spec / plan / diff / final",
@@ -59,9 +61,10 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
 
     def test_readme_and_capabilities_doc_expose_skill_consolidation_contract(self) -> None:
         combined = README_PATH.read_text(encoding="utf-8") + "\n" + CAPABILITIES_PATH.read_text(encoding="utf-8")
-        self.assertIn("v1.6-subagent-packets", combined)
+        self.assertIn("v1.7-optimization-hardening", combined)
         self.assertIn("ai-context-pack", combined)
         self.assertIn("ai-handoff", combined)
+        self.assertIn("ai-state", combined)
         self.assertIn("ai-review spec", combined)
         self.assertIn("ai-review plan", combined)
         self.assertIn("ai-review final", combined)
@@ -80,6 +83,7 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
         self.assertIn(".ai/subagent-packets/", combined)
         self.assertIn("provenance", combined)
         self.assertIn("single Chinese", combined)
+        self.assertIn("optimization-roadmap.md", combined)
 
     def test_readme_does_not_claim_subagent_or_skills_are_implemented(self) -> None:
         readme = README_PATH.read_text(encoding="utf-8")
@@ -107,7 +111,7 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
 
     def test_single_chinese_readme_exposes_current_baseline(self) -> None:
         content = README_PATH.read_text(encoding="utf-8")
-        self.assertIn("v1.6-subagent-packets", content)
+        self.assertIn("v1.7-optimization-hardening", content)
         self.assertIn("skill 创建", content)
         self.assertIn("仍未实现", content)
 

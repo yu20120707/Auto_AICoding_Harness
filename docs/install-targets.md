@@ -3,6 +3,8 @@
 This repository provides sources, not a mandatory installer for every AI coding tool.
 The preferred setup path is: ask the active local agent to inspect this file and install only the files its own environment supports.
 
+`bin/ai-install-skills` is the Codex example installer. It does not configure Claude Code, GitHub Copilot, VS Code, or generic agents.
+
 ## Source Files
 
 - `global/AGENTS.md.template`: user-level behavior baseline.
@@ -20,10 +22,20 @@ The preferred setup path is: ask the active local agent to inspect this file and
 | GitHub Copilot / VS Code | user profile instructions or `.github/copilot-instructions.md` in a workspace | `~/.copilot/skills/<skill-name>/`, `~/.agents/skills/<skill-name>/`, or project `.github/skills/<skill-name>/` | `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `AGENTS.md` |
 | Generic agent | the nearest supported global instruction file | any supported `SKILL.md` discovery root | `AGENTS.md` |
 
+## Current Support Level
+
+| Surface | Current Automation |
+| --- | --- |
+| Codex | `bin/ai-install-skills` copies all repository skills into `$CODEX_HOME/skills` or `~/.codex/skills`. Use `--dry-run` to inspect planned writes. |
+| Claude Code | Documentation and bootstrap prompt only. The active local agent should choose the supported target path. |
+| GitHub Copilot / VS Code | Documentation and generated `.github/copilot-instructions.md` only. No automatic skill install is performed. |
+| Generic agent | Documentation and bootstrap prompt only. |
+
 ## Operating Rules
 
 - Do not install anything implicitly during `git clone`.
 - Do not overwrite existing global files without a backup or explicit user approval.
+- Use `bin/ai-install-skills --dry-run` before writing Codex skills when the target directory is unclear.
 - Prefer symlinks when the local tool supports them and the repository path is stable.
 - Prefer copies when the target tool does not support symlinks well.
 - Keep global instructions short; put repository facts in each target project's `docs/ai/*`.

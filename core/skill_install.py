@@ -52,35 +52,42 @@ def install_all_skills(
     skills_root: Path,
     dest_root: Path,
     force: bool,
+    dry_run: bool = False,
     timestamp: str | None = None,
 ) -> list[SkillInstallResult]:
     install_timestamp = timestamp or datetime.now().astimezone().strftime("%Y%m%d-%H%M%S")
     backup_root = dest_root.parent / "skill-backups" / install_timestamp
-    dest_root.mkdir(parents=True, exist_ok=True)
+    if not dry_run:
+        dest_root.mkdir(parents=True, exist_ok=True)
 
     results: list[SkillInstallResult] = []
     for source in discover_skill_sources(skills_root):
         target = dest_root / source.name
 
         if not target.exists():
-            shutil.copytree(source.source_path, target)
-            results.append(SkillInstallResult(action="CREATED", name=source.name, path=target))
+            if not dry_run:
+                shutil.copytree(source.source_path, target)
+            action = "WOULD_CREATE" if dry_run else "CREATED"
+            results.append(SkillInstallResult(action=action, name=source.name, path=target))
             continue
 
         if not force:
-            results.append(SkillInstallResult(action="SKIPPED", name=source.name, path=target))
+            action = "WOULD_SKIP" if dry_run else "SKIPPED"
+            results.append(SkillInstallResult(action=action, name=source.name, path=target))
             continue
 
         backup_path = backup_root / source.name
-        backup_path.parent.mkdir(parents=True, exist_ok=True)
-        if target.is_dir():
-            shutil.copytree(target, backup_path)
-            shutil.rmtree(target)
-        else:
-            shutil.copy2(target, backup_path)
-            target.unlink()
+        if not dry_run:
+            backup_path.parent.mkdir(parents=True, exist_ok=True)
+            if target.is_dir():
+                shutil.copytree(target, backup_path)
+                shutil.rmtree(target)
+            else:
+                shutil.copy2(target, backup_path)
+                target.unlink()
 
-        shutil.copytree(source.source_path, target)
-        results.append(SkillInstallResult(action="OVERWRITTEN", name=source.name, path=target, backup_path=backup_path))
+            shutil.copytree(source.source_path, target)
+        action = "WOULD_OVERWRITE" if dry_run else "OVERWRITTEN"
+        results.append(SkillInstallResult(action=action, name=source.name, path=target, backup_path=backup_path))
 
     return results

@@ -1,11 +1,12 @@
 # Examples
 
-This directory is reserved for generated target-project examples.
+This directory contains generated target-project examples.
 
 Use it to show:
 
-- expected `small` output
-- expected `large` output
+- `small/`: output from `ai-init small`
+- `large/`: output from `ai-init small` followed by `ai-upgrade large`
 - overlay results for `cpp-linux-backend-system`
 
 Do not treat example output as the template source of truth.
+The source of truth remains `templates/` plus `profiles/`.

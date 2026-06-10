@@ -38,6 +38,7 @@ class CppProfileTemplatesIntegrationTest(unittest.TestCase):
                 "docs/ai/cmake.md",
                 "docs/ai/build.md",
                 "docs/ai/testing.md",
+                "docs/ai/verification-matrix.md",
             ]:
                 self.assertTrue((tmpdir / path).exists(), path)
 
@@ -57,6 +58,9 @@ class CppProfileTemplatesIntegrationTest(unittest.TestCase):
 
             testing_text = (tmpdir / "docs/ai/testing.md").read_text(encoding="utf-8")
             self.assertTrue("GTest" in testing_text or "CTest" in testing_text)
+            matrix_text = (tmpdir / "docs/ai/verification-matrix.md").read_text(encoding="utf-8")
+            self.assertIn("Risk Trigger", matrix_text)
+            self.assertIn("scripts/ai_check.sh", matrix_text)
 
     def test_scripts_are_safe_placeholders(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
@@ -83,9 +87,10 @@ class CppProfileTemplatesIntegrationTest(unittest.TestCase):
         capabilities = (REPO_ROOT / "docs/design/current-capabilities.md").read_text(encoding="utf-8")
         combined = readme + "\n" + capabilities
 
-        self.assertIn("v1.6-subagent-packets", combined)
+        self.assertIn("v1.7-optimization-hardening", combined)
         self.assertIn("cpp-linux-backend-system", combined)
         self.assertIn("ai-install-skills", combined)
+        self.assertIn("verification matrix", combined.lower())
 
 
 if __name__ == "__main__":

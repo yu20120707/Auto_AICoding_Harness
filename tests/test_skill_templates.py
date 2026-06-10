@@ -87,6 +87,19 @@ class SkillTemplatesIntegrationTest(unittest.TestCase):
         for path in SKILL_SOURCE_PATHS:
             self.assertTrue((REPO_ROOT / path).exists(), path)
 
+    def test_skill_directories_are_all_live_sources(self) -> None:
+        live_skill_dirs = {
+            str((REPO_ROOT / path).parent.relative_to(SKILLS_ROOT)).replace("\\", "/")
+            for path in SKILL_SOURCE_PATHS
+        }
+        discovered_dirs = {
+            str(path.relative_to(SKILLS_ROOT)).replace("\\", "/")
+            for group in ["methodology", "system"]
+            for path in (SKILLS_ROOT / group).iterdir()
+            if path.is_dir()
+        }
+        self.assertEqual(live_skill_dirs, discovered_dirs)
+
     def test_skill_sources_have_expected_sections_and_terms(self) -> None:
         for skill_path in SKILL_SOURCE_PATHS:
             content = (REPO_ROOT / skill_path).read_text(encoding="utf-8")
@@ -143,6 +156,17 @@ class SkillTemplatesIntegrationTest(unittest.TestCase):
             for skill_name in SKILL_NAMES:
                 self.assertTrue((dest / skill_name / "SKILL.md").exists(), skill_name)
                 self.assertIn(f"CREATED {skill_name}", result.stdout)
+
+    def test_ai_install_skills_dry_run_does_not_write(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-skills-") as tmp:
+            dest = Path(tmp) / "codex-skills"
+
+            result = self.install_skills(dest, "--dry-run")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("DRY_RUN no files written", result.stdout)
+            self.assertIn("surface: Codex example installer", result.stdout)
+            self.assertIn("WOULD_CREATE karpathy-guidelines", result.stdout)
+            self.assertFalse(dest.exists())
 
     def test_default_does_not_overwrite_global_skill(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-skills-") as tmp:
@@ -219,9 +243,10 @@ class SkillTemplatesIntegrationTest(unittest.TestCase):
             + "\n"
             + TARGET_STRUCTURE_PATH.read_text(encoding="utf-8")
         )
-        self.assertIn("v1.6-subagent-packets", combined)
+        self.assertIn("v1.7-optimization-hardening", combined)
         self.assertIn("portable skill", combined)
         self.assertIn("ai-install-skills", combined)
+        self.assertIn("--dry-run", combined)
         self.assertIn("subagent execution", combined)
         self.assertIn("skills/", combined)
         self.assertIn("karpathy-guidelines/SKILL.md", combined)

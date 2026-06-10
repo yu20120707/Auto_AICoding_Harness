@@ -17,6 +17,7 @@ The safer model is to provide clear sources, suggested targets, and a bootstrap 
 
 - Canonical skill source: `skills/`
 - Example installer: `bin/ai-install-skills`
+- Dry-run inspection: `bin/ai-install-skills --dry-run`
 - Target-project entrypoint: `AGENTS.md`
 - Runtime state: `.ai/*`
 
@@ -51,3 +52,9 @@ Generic agents should read:
 - no mandatory platform plugin framework
 - no single fixed global `AGENTS.md` location
 - no duplicated project facts in global instructions
+
+## Current Automation Boundary
+
+Only Codex has an implemented example installer.
+Claude Code, GitHub Copilot / VS Code, and generic agents are supported through documented install targets and the bootstrap prompt.
+They are not configured by `ai-install-skills`.

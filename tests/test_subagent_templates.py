@@ -163,7 +163,7 @@ class SubagentTemplatesIntegrationTest(unittest.TestCase):
         capabilities = (REPO_ROOT / "docs/design/current-capabilities.md").read_text(encoding="utf-8")
         combined = readme + "\n" + capabilities
 
-        self.assertIn("v1.6-subagent-packets", combined)
+        self.assertIn("v1.7-optimization-hardening", combined)
         self.assertIn("subagent role templates", combined)
         self.assertIn("subagent task packet", combined)
         self.assertIn("subagent execution", combined)

@@ -6,6 +6,7 @@ This is an executable operator guide for the current self-use harness baseline.
 
 ```powershell
 py bin/ai-status
+py bin/ai-state
 py bin/ai-init small
 py bin/ai-upgrade large
 py bin/ai-review spec
@@ -30,6 +31,7 @@ py bin/ai-status
 
 ```bash
 python3 bin/ai-status
+python3 bin/ai-state
 python3 bin/ai-init small
 python3 bin/ai-upgrade large
 python3 bin/ai-review spec
@@ -66,6 +68,7 @@ python3 bin/ai-status
 12. Run `ai-handoff` to produce a continuation artifact for the next session.
 13. Run `ai-review final`, then `ai-approve final` or `ai-reject final`.
 14. Run `ai-status` again to confirm the final state.
+15. Run `ai-state` when another tool needs machine-readable JSON state.
 
 ## Important Notes
 

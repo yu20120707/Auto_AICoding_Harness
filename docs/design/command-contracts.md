@@ -2,21 +2,20 @@
 
 ## Command Set
 
-The current implemented command set in `v1.6-subagent-packets` is:
+The current implemented command set in `v1.7-optimization-hardening` is:
 
 - `ai-init`
 - `ai-install-skills`
 - `ai-upgrade`
 - `ai-status`
+- `ai-state`
 - `ai-review`
 - `ai-approve`
 - `ai-reject`
 - `ai-context-pack`
 - `ai-handoff`
 
-The following command names remain design-level only and are not implemented yet:
-
-- `ai-state`
+No command names are currently reserved here as design-level only.
 
 ## Contract Principles
 
@@ -34,6 +33,7 @@ The following command names remain design-level only and are not implemented yet
 - does not run during `git clone`
 - does not fetch third-party skills
 - does not install global `AGENTS.md`, Claude, Copilot, or generic-agent files
+- supports `--dry-run` to show planned Codex skill writes without changing files
 - existing skills are skipped unless `--force` is passed
 - `--force` backs up overwritten skills under `skill-backups/<timestamp>/`
 
@@ -61,6 +61,7 @@ The following command names remain design-level only and are not implemented yet
 - outputs canonical structured state
 - is the machine-facing state entrypoint
 - should remain thin over `state.json`
+- prints `UNINITIALIZED` JSON when no `.ai/state.json` exists
 
 ### `ai-review`
 

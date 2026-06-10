@@ -28,6 +28,7 @@ This profile overlays target-project `docs/ai/` guidance for:
 - performance work
 - CMake and build conventions
 - testing expectations
+- verification matrix and risk-triggered checks
 
 The profile does not change the core workflow or state machine.
 

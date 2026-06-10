@@ -28,8 +28,10 @@ Windows:
 ```powershell
 py bin/ai-status
 py bin/ai-install-skills
+py bin/ai-install-skills --dry-run
 py bin/ai-init small
 py bin/ai-upgrade large
+py bin/ai-state
 ```
 
 类 Unix:
@@ -37,8 +39,10 @@ py bin/ai-upgrade large
 ```bash
 python3 bin/ai-status
 python3 bin/ai-install-skills
+python3 bin/ai-install-skills --dry-run
 python3 bin/ai-init small
 python3 bin/ai-upgrade large
+python3 bin/ai-state
 ```
 
 如果脚本有执行权限，也可以直接运行：
@@ -60,7 +64,7 @@ bin/ai-init small
 
 ## 当前能力
 
-当前基线：`v1.6-subagent-packets`。
+当前基线：`v1.7-optimization-hardening`。
 
 已实现命令：
 
@@ -68,6 +72,7 @@ bin/ai-init small
 - `ai-init small`
 - `ai-upgrade large`
 - `ai-status`
+- `ai-state`
 - `ai-review spec / plan / diff / final`
 - `ai-approve spec / plan / diff / final`
 - `ai-reject spec / plan / diff / final`
@@ -89,6 +94,7 @@ bin/ai-init small
 - `CLAUDE.md`
 - `.github/copilot-instructions.md`
 - `docs/ai/`
+- `docs/ai/verification-matrix.md`
 - `scripts/ai_build.sh`
 - `scripts/ai_test.sh`
 - `scripts/ai_check.sh`
@@ -123,11 +129,12 @@ bin/ai-init small
 安装到 Codex 示例位置：
 
 ```powershell
+py bin/ai-install-skills --dry-run
 py bin/ai-install-skills
 py bin/ai-install-skills --force
 ```
 
-其他 agent 的安装位置参考 `docs/install-targets.md`。
+`ai-install-skills` 是 Codex 示例安装器。其他 agent 的安装位置参考 `docs/install-targets.md` 和 `prompts/bootstrap-local-agent.md`。
 
 ## 仓库结构
 
@@ -149,10 +156,12 @@ Windows:
 ```powershell
 py -m compileall bin core
 py tests/test_ai_init_small.py
+py tests/test_ai_state.py
 py tests/test_ai_upgrade_large.py
 py tests/test_current_capabilities.py
 py tests/test_subagent_templates.py
 py tests/test_skill_templates.py
+py tests/test_examples.py
 ```
 
 完整回归还包括：
@@ -180,6 +189,7 @@ py tests/test_e2e_workflow.py
 - `docs/design/subagent-packets.md`
 - `docs/install-targets.md`
 - `docs/usage/generated-target-structure.md`
+- `docs/usage/optimization-roadmap.md`
 - `skills/README.md`
 
 ## 安全边界

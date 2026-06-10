@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "mode": "large",
+  "profile": "cpp-linux-backend-system",
+  "status": "INIT",
+  "current_gate": null,
+  "approved_gates": [],
+  "created_by": "Auto_AICoding_Harness",
+  "task_id": "init-small",
+  "task_title": "Initialize harness in small mode",
+  "updated_at": "2026-06-10T14:44:27+08:00"
+}

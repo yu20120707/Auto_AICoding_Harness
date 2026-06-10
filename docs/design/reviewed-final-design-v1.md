@@ -104,5 +104,5 @@ The original stable baseline shipped in this repository was:
 - template-source skeleton
 - initial `cpp-linux-backend-system` profile scaffold
 
-The current implementation baseline is `v1.6-subagent-packets`.
+The current implementation baseline is `v1.7-optimization-hardening`.
 Actual command implementation should conform to the adjacent contract documents, with future-only capabilities marked explicitly as not implemented.

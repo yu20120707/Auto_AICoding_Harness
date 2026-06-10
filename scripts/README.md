@@ -1,23 +1,20 @@
 # Scripts
 
-This directory will hold the implementation of:
+This directory is for target-project helper script templates and repository-level
+utility notes.
 
-- `ai-init`
-- `ai-upgrade`
-- `ai-status`
-- `ai-state`
-- `ai-review`
-- `ai-approve`
-- `ai-reject`
-- `ai-context-pack`
-- `ai-handoff`
+The user-facing command entrypoints live in `bin/`.
+Shared command logic lives in `core/`.
+Generated target-project script templates live under `templates/base/root/scripts/`.
 
-## Planned Internal Groups
+Do not move command implementations into this directory unless the repository
+contracts are intentionally changed.
 
-- `init/`
-- `upgrade/`
-- `review/`
-- `state/`
-- `shared/`
+## Current Generated Script Templates
 
-Implementation must follow the contracts in `docs/design/`.
+- `templates/base/root/scripts/ai_build.sh`
+- `templates/base/root/scripts/ai_test.sh`
+- `templates/base/root/scripts/ai_check.sh`
+
+Those scripts are placeholders for target projects to adapt. They are not the
+harness CLI implementation.
