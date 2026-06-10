@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+import sys
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from core.state import STATE_RELATIVE_PATH, load_state
+from core.subagent import RUN_TRACE_PATH, ROLES, append_dispatch_record, parse_skill_sections, render_dispatch_record
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Append a standardized large-mode subagent dispatch record to .ai/run-trace.md."
+    )
+    parser.add_argument("role", choices=ROLES)
+    parser.add_argument("--scope", required=True, help="bounded file, module, or responsibility scope for the dispatch")
+    parser.add_argument("--objective", required=True, help="explicit bounded objective for the dispatch")
+    parser.add_argument("--expected-output", required=True, help="what the delegated worker should return")
+    parser.add_argument("--result-location", required=True, help="where the delegated result should be recorded")
+    return parser.parse_args()
+
+
+def require_large_mode(target_root: Path) -> dict:
+    state_path = target_root / STATE_RELATIVE_PATH
+    if not state_path.exists():
+        raise RuntimeError("target repository is not initialized: missing .ai/state.json")
+
+    state = load_state(target_root)
+    if state is None:
+        raise RuntimeError("target repository is not initialized: missing .ai/state.json")
+    if state.get("mode") != "large":
+        raise RuntimeError("ai-dispatch requires large mode")
+    return state
+
+
+def main() -> int:
+    try:
+        args = parse_args()
+        target_root = Path.cwd()
+        require_large_mode(target_root)
+        required_skills, optional_skills = parse_skill_sections(target_root, args.role)
+        record = render_dispatch_record(
+            role=args.role,
+            scope=args.scope,
+            required_skills=required_skills,
+            optional_skills=optional_skills,
+            objective=args.objective,
+            expected_output=args.expected_output,
+            result_location=args.result_location,
+        )
+        append_dispatch_record(target_root, record)
+        print(f"APPENDED {RUN_TRACE_PATH.as_posix()} (dispatch: {args.role})")
+        return 0
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

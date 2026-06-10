@@ -40,6 +40,10 @@ class AiApproveRejectAllGatesIntegrationTest(unittest.TestCase):
     def prepare_waiting_gate(self, tmpdir: Path, gate: str) -> None:
         self.prepare_large(tmpdir)
         if gate == "final":
+            (tmpdir / ".ai" / "verification.md").write_text(
+                "# Verification\n\n## Ran\n\n- command: py tests/test_ai_init_small.py\n- result: passed\n- notes: smoke\n\n## Not Run\n\n- item:\n- reason:\n- required follow-up:\n",
+                encoding="utf-8",
+            )
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-context-pack")).returncode, 0)
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-handoff")).returncode, 0)
         review = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), gate)
@@ -111,6 +115,21 @@ class AiApproveRejectAllGatesIntegrationTest(unittest.TestCase):
             result = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-approve"), "plan")
             self.assertNotEqual(result.returncode, 0)
             self.assertNotEqual(self.load_state(tmpdir)["status"], "PLAN_APPROVED")
+
+    def test_final_approval_requires_meaningful_verification(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
+            tmpdir = Path(tmp)
+            self.prepare_waiting_gate(tmpdir, "final")
+            verification_path = tmpdir / ".ai" / "verification.md"
+            verification_path.write_text(
+                "# Verification\n\n## Ran\n\n- command:\n- result:\n- notes:\n\n## Not Run\n\n- item:\n- reason:\n- required follow-up:\n",
+                encoding="utf-8",
+            )
+
+            result = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-approve"), "final")
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn(".ai/verification.md", result.stderr)
+            self.assertEqual(self.load_state(tmpdir)["status"], "WAITING_HUMAN_FINAL_APPROVAL")
 
     def test_missing_review_file_fails(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:

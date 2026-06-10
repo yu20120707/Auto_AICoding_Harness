@@ -31,6 +31,7 @@ py bin/ai-install-skills
 py bin/ai-install-skills --dry-run
 py bin/ai-init small
 py bin/ai-upgrade large
+py bin/ai-dispatch planner --scope "docs/design/*" --objective "plan bounded hardening" --expected-output "plan + risks" --result-location ".ai/run-trace.md"
 py bin/ai-state
 ```
 
@@ -42,6 +43,7 @@ python3 bin/ai-install-skills
 python3 bin/ai-install-skills --dry-run
 python3 bin/ai-init small
 python3 bin/ai-upgrade large
+python3 bin/ai-dispatch planner --scope "docs/design/*" --objective "plan bounded hardening" --expected-output "plan + risks" --result-location ".ai/run-trace.md"
 python3 bin/ai-state
 ```
 
@@ -60,7 +62,8 @@ bin/ai-init small
 4. 在目标项目根目录执行 `ai-init small`。
 5. 普通任务保持 small mode。
 6. 复杂任务执行 `ai-upgrade large`，启用 spec / plan / review / approval / handoff 骨架。
-7. 用 `ai-status` 查看当前状态。
+7. 如果真的要派发 subagent，先运行 `ai-dispatch`，把角色包里的 skill 显式展开并记录进 `.ai/run-trace.md`。
+8. 用 `ai-status` 查看当前状态。
 
 ## 当前能力
 
@@ -73,6 +76,7 @@ bin/ai-init small
 - `ai-upgrade large`
 - `ai-status`
 - `ai-state`
+- `ai-dispatch`
 - `ai-review spec / plan / diff / final`
 - `ai-approve spec / plan / diff / final`
 - `ai-reject spec / plan / diff / final`
@@ -94,6 +98,7 @@ bin/ai-init small
 - `CLAUDE.md`
 - `.github/copilot-instructions.md`
 - `docs/ai/`
+- `docs/ai/workflow.md`
 - `docs/ai/verification-matrix.md`
 - `scripts/ai_build.sh`
 - `scripts/ai_test.sh`
@@ -109,6 +114,7 @@ bin/ai-init small
 - `.ai/implementation-plan.md`
 - `.ai/affected-files.md`
 - `.ai/run-trace.md`
+- `.ai/verification.md`
 - `.ai/evaluation.md`
 - `.ai/reviews/`
 - `.ai/approvals/`
@@ -116,6 +122,8 @@ bin/ai-init small
 - `.codex/agents/`
 
 `.ai/subagent-packets/` 是角色任务包模板，用来把任务目标、上下文、建议 skills、禁止事项和返回格式传给本地 agent 或 subagent。它不是自动执行器。
+
+`ai-dispatch` 是一个薄记录助手：它只会在 large mode 下读取对应角色包里的 `Required Skills` / `Optional Skills`，然后把标准 dispatch 记录追加到 `.ai/run-trace.md`。它不会启动 subagent，也不会推进状态。
 
 ## Skills
 
@@ -158,6 +166,7 @@ py -m compileall bin core
 py tests/test_ai_init_small.py
 py tests/test_ai_state.py
 py tests/test_ai_upgrade_large.py
+py tests/test_ai_dispatch.py
 py tests/test_current_capabilities.py
 py tests/test_subagent_templates.py
 py tests/test_skill_templates.py

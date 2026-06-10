@@ -49,6 +49,7 @@ Every packet should include:
 
 Skills are advisory routing hints.
 They help Codex, Claude, Copilot, or another local agent choose the right local guidance, but absence of a skill must not block execution when the needed context is already present.
+However, when a real subagent dispatch happens, the main agent should still copy the packet's skill list explicitly into the dispatch request instead of relying on the role name alone.
 
 ## Role Map
 
@@ -82,6 +83,16 @@ Do not assume a subagent has implicit memory of the main conversation.
 If the context matters, include it or point to the exact file.
 
 ## Output Routing
+
+Every real subagent dispatch should also create a dispatch record in `.ai/run-trace.md` that includes at least:
+
+- role
+- scope
+- required skills
+- optional skills
+- objective
+- expected output
+- result location
 
 Packet output should be summarized into the existing large-mode artifacts:
 

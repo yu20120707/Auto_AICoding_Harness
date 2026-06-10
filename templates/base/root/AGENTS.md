@@ -9,6 +9,7 @@ This repository uses `Auto_AICoding_harness` base workflow.
 Read `docs/ai/README.md` first.
 
 For non-trivial tasks, also read the relevant `docs/ai/*` files for the area you are changing.
+Read `docs/ai/workflow.md` before driving a multi-step or resumed task.
 
 Always read active `.ai/` task files when they exist.
 
@@ -24,7 +25,7 @@ Always read active `.ai/` task files when they exist.
 
 - `AGENTS.md` is the thin project entrypoint.
 - `docs/ai/*` stores durable project facts.
-- `.ai/*` stores current task runtime, state, reviews, approvals, and handoff artifacts.
+- `.ai/*` stores current task runtime, state, plans, verification, reviews, approvals, and handoff artifacts.
 - Skills provide reusable methods when available, but they do not override this file.
 
 ## Safety

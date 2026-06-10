@@ -9,6 +9,7 @@ The current implemented command set in `v1.7-optimization-hardening` is:
 - `ai-upgrade`
 - `ai-status`
 - `ai-state`
+- `ai-dispatch`
 - `ai-review`
 - `ai-approve`
 - `ai-reject`
@@ -63,18 +64,29 @@ No command names are currently reserved here as design-level only.
 - should remain thin over `state.json`
 - prints `UNINITIALIZED` JSON when no `.ai/state.json` exists
 
+### `ai-dispatch`
+
+- appends a standardized subagent dispatch record to `.ai/run-trace.md`
+- only works in initialized `large` mode
+- reads `.ai/subagent-packets/<role>.md` to expand `Required Skills` and `Optional Skills`
+- records skill assignment, scope, objective, expected output, and result location
+- does not start or manage subagents
+- does not advance state
+
 ### `ai-review`
 
 - generates gate-specific review artifacts
 - only covers review generation, not state approval
 - current implementation supports `spec`, `plan`, `diff`, and `final`
 - `spec`, `plan`, and `final` only generate review material and move state into the corresponding waiting gate
+- `final` review can summarize `.ai/verification.md` when the target project records command evidence there
 
 ### `ai-approve`
 
 - records explicit approval for a gate
 - advances state when approval is valid
 - current implementation supports `spec`, `plan`, `diff`, and `final`
+- `final` approval also requires meaningful verification evidence in `.ai/verification.md`
 
 ### `ai-reject`
 
@@ -121,5 +133,5 @@ Those belong to the active profile overlay.
 
 ## Release Baseline Note
 
-Phase 8 adds no new commands.
-It is a release-baseline alignment pass over documentation, usage guidance, and end-to-end verification.
+Phase 8 originally added no new commands.
+The current baseline extends that surface with `ai-install-skills`, `ai-state`, `ai-context-pack`, `ai-handoff`, and `ai-dispatch` while keeping the same workflow contract model.

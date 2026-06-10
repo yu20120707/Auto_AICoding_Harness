@@ -17,6 +17,7 @@ class ExamplesStructureTest(unittest.TestCase):
             ".ai/state.json",
             ".ai/templates/README.md",
             "docs/ai/README.md",
+            "docs/ai/workflow.md",
             "docs/ai/verification-matrix.md",
             "scripts/ai_check.sh",
         ]:
@@ -28,6 +29,7 @@ class ExamplesStructureTest(unittest.TestCase):
             ".ai/epic.md",
             ".ai/spec.md",
             ".ai/implementation-plan.md",
+            ".ai/verification.md",
             ".ai/reviews/README.md",
             ".ai/approvals/README.md",
             ".ai/subagent-packets/README.md",

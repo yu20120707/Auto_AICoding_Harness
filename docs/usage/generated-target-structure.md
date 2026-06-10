@@ -27,6 +27,7 @@ target-repo/
 │   ├── cmake.md
 │   ├── build.md
 │   ├── testing.md
+│   ├── workflow.md
 │   └── verification-matrix.md
 ├── scripts/
 │   ├── ai_build.sh
@@ -49,6 +50,7 @@ target-repo/
     ├── implementation-plan.md
     ├── affected-files.md
     ├── run-trace.md
+    ├── verification.md
     ├── evaluation.md
     ├── context-pack.md
     ├── handoff.md
@@ -92,7 +94,10 @@ Auto_AICoding_Harness/
 ## When Files Appear
 
 - `ai-init small` creates the base repository structure: `AGENTS.md`, `docs/ai/`, `scripts/`, `.ai/state.json`, and `.ai/templates/`.
-- `ai-upgrade large` adds the richer `.ai/` planning and review scaffold such as `epic.md`, `spec.md`, `scope.md`, `implementation-plan.md`, `affected-files.md`, `run-trace.md`, `evaluation.md`, `reviews/`, and `approvals/`.
+- `ai-init small` also adds `docs/ai/workflow.md` so target projects have a durable execution contract outside runtime state.
+- `ai-upgrade large` adds the richer `.ai/` planning and review scaffold such as `epic.md`, `spec.md`, `scope.md`, `implementation-plan.md`, `affected-files.md`, `run-trace.md`, `verification.md`, `evaluation.md`, `reviews/`, and `approvals/`.
+- `run-trace.md` is also the required place to record any real subagent dispatch with explicit role-to-skill mapping.
+- `ai-dispatch` appends that standardized dispatch record into `run-trace.md` when large mode is active.
 - `ai-upgrade large` also adds optional `.codex/agents/` role templates.
 - `ai-upgrade large` also adds `.ai/subagent-packets/` prompt/context templates for bounded role delegation.
 - `ai-install-skills` installs the repository-owned skill set into the user's Codex skills directory as an example installer.

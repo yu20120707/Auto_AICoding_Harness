@@ -46,6 +46,7 @@ class AiUpgradeLargeIntegrationTest(unittest.TestCase):
                 ".ai/epic.md",
                 ".ai/implementation-plan.md",
                 ".ai/run-trace.md",
+                ".ai/verification.md",
                 ".ai/reviews",
                 ".ai/approvals",
                 ".ai/subagent-packets/README.md",

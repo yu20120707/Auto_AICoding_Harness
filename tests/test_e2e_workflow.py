@@ -57,6 +57,10 @@ class EndToEndWorkflowTest(unittest.TestCase):
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "diff").returncode, 0)
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-approve"), "diff").returncode, 0)
 
+            (tmpdir / ".ai" / "verification.md").write_text(
+                "# Verification\n\n## Ran\n\n- command: py tests/test_e2e_workflow.py\n- result: passed-local-flow\n- notes: e2e fixture evidence\n\n## Not Run\n\n- item:\n- reason:\n- required follow-up:\n",
+                encoding="utf-8",
+            )
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-context-pack")).returncode, 0)
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-handoff")).returncode, 0)
 
@@ -84,6 +88,7 @@ class EndToEndWorkflowTest(unittest.TestCase):
                 ".ai/approvals/final-approval.md",
                 ".ai/context-pack.md",
                 ".ai/handoff.md",
+                ".ai/verification.md",
             ]:
                 self.assertTrue((tmpdir / path).exists(), path)
 

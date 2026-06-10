@@ -22,6 +22,7 @@ from core.state import (
     update_state_for_diff_approved,
     write_state_payload,
 )
+from core.verification import has_meaningful_verification
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Approve a harness gate decision.")
@@ -45,6 +46,8 @@ def require_waiting_gate(target_root: Path, gate: str) -> dict:
         raise RuntimeError(f"current gate does not allow {gate} approval: {state.get('current_gate')}")
     if not (target_root / config.review_path).exists():
         raise RuntimeError(f"missing required review material: {config.review_path.as_posix()}")
+    if gate == "final" and not has_meaningful_verification(target_root):
+        raise RuntimeError("final approval requires a populated .ai/verification.md with at least one recorded command")
     return state
 
 

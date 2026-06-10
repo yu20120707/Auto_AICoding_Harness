@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 import subprocess
 
+from core.verification import VERIFICATION_PATH
+
 
 @dataclass(frozen=True)
 class GitDiffData:
@@ -191,6 +193,7 @@ def render_plan_review(plan_text: str) -> str:
 
 def render_final_review(target_root: Path) -> str:
     sources = [
+        VERIFICATION_PATH,
         Path(".ai") / "evaluation.md",
         Path(".ai") / "context-pack.md",
         Path(".ai") / "handoff.md",
@@ -244,6 +247,7 @@ def require_review_input_exists(target_root: Path, review_type: str) -> None:
 
     if review_type == "final":
         candidates = [
+            VERIFICATION_PATH,
             Path(".ai") / "evaluation.md",
             Path(".ai") / "context-pack.md",
             Path(".ai") / "handoff.md",

@@ -78,7 +78,9 @@ class AiReviewSpecPlanFinalIntegrationTest(unittest.TestCase):
 
             review_path = tmpdir / ".ai" / "reviews" / "final-review.md"
             self.assertTrue(review_path.exists())
-            self.assertIn("Final Review", review_path.read_text(encoding="utf-8"))
+            review_text = review_path.read_text(encoding="utf-8")
+            self.assertIn("Final Review", review_text)
+            self.assertIn(".ai/verification.md", review_text)
 
             state = json.loads((tmpdir / ".ai" / "state.json").read_text(encoding="utf-8"))
             self.assertEqual(state["status"], "WAITING_HUMAN_FINAL_APPROVAL")

@@ -20,6 +20,7 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
             "ai-upgrade",
             "ai-status",
             "ai-state",
+            "ai-dispatch",
             "ai-review",
             "ai-approve",
             "ai-reject",
@@ -42,6 +43,7 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
             "ai-upgrade large",
             "ai-status",
             "ai-state",
+            "ai-dispatch",
             "ai-review spec / plan / diff / final",
             "ai-approve spec / plan / diff / final",
             "ai-reject spec / plan / diff / final",
@@ -65,6 +67,9 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
         self.assertIn("ai-context-pack", combined)
         self.assertIn("ai-handoff", combined)
         self.assertIn("ai-state", combined)
+        self.assertIn("ai-dispatch", combined)
+        self.assertIn("workflow.md", combined)
+        self.assertIn("verification.md", combined)
         self.assertIn("ai-review spec", combined)
         self.assertIn("ai-review plan", combined)
         self.assertIn("ai-review final", combined)
@@ -79,8 +84,10 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
         self.assertIn("global/AGENTS.md.template", combined)
         self.assertIn("repo-onboarding-analysis", combined)
         self.assertIn("maps large-mode subagent roles to recommended global skills", combined)
+        self.assertIn("canonical dispatch log", combined)
         self.assertIn("subagent task packet", combined)
         self.assertIn(".ai/subagent-packets/", combined)
+        self.assertIn("role-to-skill mapping", combined)
         self.assertIn("provenance", combined)
         self.assertIn("single Chinese", combined)
         self.assertIn("optimization-roadmap.md", combined)

@@ -44,6 +44,7 @@ class AiInitSmallIntegrationTest(unittest.TestCase):
                 "CLAUDE.md",
                 ".github/copilot-instructions.md",
                 "docs/ai",
+                "docs/ai/workflow.md",
                 ".ai/.gitkeep",
                 ".ai/templates",
                 ".ai/state.json",

@@ -93,6 +93,32 @@ class SubagentTemplatesIntegrationTest(unittest.TestCase):
                 for term in terms:
                     self.assertIn(term, content, filename)
 
+    def test_run_trace_template_requires_dispatch_skill_record(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
+            tmpdir = Path(tmp)
+            self.prepare_large(tmpdir)
+
+            content = (tmpdir / ".ai" / "run-trace.md").read_text(encoding="utf-8")
+            for term in [
+                "Subagent Dispatch Record",
+                "required_skills",
+                "optional_skills",
+                "result_location",
+            ]:
+                self.assertIn(term, content)
+
+    def test_packet_and_agent_readmes_require_explicit_skill_copy_and_dispatch_log(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
+            tmpdir = Path(tmp)
+            self.prepare_large(tmpdir)
+
+            packet_readme = (tmpdir / ".ai" / "subagent-packets" / "README.md").read_text(encoding="utf-8")
+            agent_readme = (tmpdir / ".codex" / "agents" / "README.md").read_text(encoding="utf-8")
+            self.assertIn("Required Skills", packet_readme)
+            self.assertIn(".ai/run-trace.md", packet_readme)
+            self.assertIn("copy the role's skill guidance explicitly", agent_readme)
+            self.assertIn(".ai/run-trace.md", agent_readme)
+
     def test_default_does_not_overwrite(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             tmpdir = Path(tmp)

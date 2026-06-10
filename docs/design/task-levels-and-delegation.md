@@ -34,6 +34,7 @@ Use complex mode when the task changes architecture, shared contracts, high-risk
 - require `spec`, `plan`, `diff`, and `final` gates when applicable
 - use planner, explorer, implementer, reviewer, and evaluator roles when available
 - store evidence in `.ai/run-trace.md`, `.ai/reviews/*`, `.ai/approvals/*`, and `.ai/evaluation.md`
+- if a real subagent is dispatched, record its role, scope, required skills, optional skills, objective, and result location in `.ai/run-trace.md`
 
 ## Multi-Agent vs State Machine
 

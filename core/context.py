@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 import subprocess
 
+from core.verification import render_verification_summary
+
 
 REVIEW_PATH = Path(".ai") / "reviews" / "diff-review.md"
 APPROVAL_PATH = Path(".ai") / "approvals" / "diff-approval.md"
@@ -53,6 +55,7 @@ def render_context_pack(target_root: Path, state: dict, git_summary: GitSummary)
         f"- AGENTS.md: {_present(target_root / 'AGENTS.md')}\n"
         f"- docs/ai/: {_present(target_root / 'docs' / 'ai')}\n"
         f"- scripts/ai_check.sh: {_present(target_root / 'scripts' / 'ai_check.sh')}\n"
+        f"- .ai/verification.md: {_present(target_root / Path('.ai') / 'verification.md')}\n"
         f"- .ai/reviews/diff-review.md: {_present(target_root / REVIEW_PATH)}\n"
         f"- .ai/approvals/diff-approval.md: {_present(target_root / APPROVAL_PATH)}\n\n"
         "## Git Summary\n\n"
@@ -71,6 +74,12 @@ def render_context_pack(target_root: Path, state: dict, git_summary: GitSummary)
         f"{_recent_review_summary(target_root)}\n\n"
         "## Recent Approval\n\n"
         f"{_recent_approval_summary(target_root)}\n\n"
+        "## Plan Snapshot\n\n"
+        f"{_artifact_excerpt_summary(target_root, Path('.ai') / 'spec.md', label='spec')}\n"
+        f"{_artifact_excerpt_summary(target_root, Path('.ai') / 'implementation-plan.md', label='plan')}\n"
+        f"{_artifact_excerpt_summary(target_root, Path('.ai') / 'affected-files.md', label='affected-files')}\n\n"
+        "## Verification Snapshot\n\n"
+        f"{render_verification_summary(target_root)}\n\n"
         "## Next Suggested Action\n\n"
         f"{_next_suggested_action(state)}\n"
     )
@@ -93,6 +102,12 @@ def render_handoff(target_root: Path, state: dict, git_summary: GitSummary) -> s
         "```\n\n"
         "## Validation / Review Artifacts\n\n"
         f"{_artifact_list(target_root)}\n\n"
+        "## Plan Snapshot\n\n"
+        f"{_artifact_excerpt_summary(target_root, Path('.ai') / 'spec.md', label='spec')}\n"
+        f"{_artifact_excerpt_summary(target_root, Path('.ai') / 'implementation-plan.md', label='plan')}\n"
+        f"{_artifact_excerpt_summary(target_root, Path('.ai') / 'affected-files.md', label='affected-files')}\n\n"
+        "## Verification Snapshot\n\n"
+        f"{render_verification_summary(target_root)}\n\n"
         "## Current Blocker / Gate\n\n"
         f"{_current_blocker(state)}\n\n"
         "## Next Action\n\n"
@@ -129,10 +144,22 @@ def _what_has_been_done(target_root: Path, state: dict) -> str:
         items.append("- upgraded large")
     if (target_root / REVIEW_PATH).exists():
         items.append("- diff review generated")
+    if (target_root / (Path(".ai") / "reviews" / "spec-review.md")).exists():
+        items.append("- spec review generated")
+    if (target_root / (Path(".ai") / "reviews" / "plan-review.md")).exists():
+        items.append("- plan review generated")
+    if (target_root / (Path(".ai") / "reviews" / "final-review.md")).exists():
+        items.append("- final review generated")
+    if "spec" in state.get("approved_gates", []):
+        items.append("- spec approved")
+    if "plan" in state.get("approved_gates", []):
+        items.append("- plan approved")
     if state.get("status") == "DIFF_APPROVED":
         items.append("- diff approved")
     if state.get("status") == "NEEDS_FIX":
         items.append("- diff rejected")
+    if "final" in state.get("approved_gates", []):
+        items.append("- final approved")
     return "\n".join(items) or "- no recorded progress"
 
 
@@ -142,6 +169,7 @@ def _artifact_list(target_root: Path) -> str:
         APPROVAL_PATH,
         CONTEXT_PACK_PATH,
         Path(".ai") / "run-trace.md",
+        Path(".ai") / "verification.md",
         Path(".ai") / "evaluation.md",
     ]
     lines = []
@@ -164,11 +192,35 @@ def _next_suggested_action(state: dict) -> str:
         return "- Run `ai-approve diff` or `ai-reject diff`."
     if status == "DIFF_APPROVED":
         return "- Continue implementation or generate final validation artifacts."
+    if status == "WAITING_HUMAN_FINAL_APPROVAL":
+        return "- Review .ai/verification.md, then run `ai-approve final` or `ai-reject final`."
+    if status == "PLAN_APPROVED":
+        return "- Execute the plan, keep .ai/run-trace.md current, and record validation in .ai/verification.md."
+    if status == "SPEC_APPROVED":
+        return "- Refine .ai/implementation-plan.md and run `ai-review plan`."
+    if status == "NEEDS_MORE_TESTS":
+        return "- Add missing verification evidence in .ai/verification.md and rerun `ai-review final`."
     if status == "NEEDS_FIX":
         return "- Fix issues and rerun `ai-review diff`."
     if status == "INIT":
         return "- Start a task or run `ai-review diff` after changes."
     return f"- Continue from status `{status}` with the smallest safe next step."
+
+
+def _artifact_excerpt_summary(target_root: Path, artifact: Path, *, label: str) -> str:
+    path = target_root / artifact
+    if not path.exists():
+        return f"- {label}: missing"
+
+    text = path.read_text(encoding="utf-8").strip()
+    if not text:
+        return f"- {label}: empty"
+
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    summary = " ".join(lines[:2])
+    if len(summary) > 160:
+        summary = summary[:157].rstrip() + "..."
+    return f"- {label}: {summary}"
 
 
 def _markdown_value(path: Path, header: str) -> str | None:

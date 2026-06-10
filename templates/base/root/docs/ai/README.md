@@ -9,10 +9,12 @@ Typical contents:
 - architecture notes
 - build and test entrypoints
 - review checklists
+- workflow rules that should survive individual tasks
 - risk notes that outlive a single task
 
 For `cpp-linux-backend-system` projects, start with:
 
+- `docs/ai/workflow.md`
 - `docs/ai/cpp-system.md`
 - `docs/ai/linux-debug.md`
 - `docs/ai/network.md`

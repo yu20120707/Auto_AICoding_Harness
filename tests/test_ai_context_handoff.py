@@ -86,8 +86,37 @@ class AiContextHandoffIntegrationTest(unittest.TestCase):
             context_text = (tmpdir / ".ai" / "context-pack.md").read_text(encoding="utf-8")
             handoff_text = (tmpdir / ".ai" / "handoff.md").read_text(encoding="utf-8")
             self.assertIn("WAITING_HUMAN_DIFF_APPROVAL", context_text)
+            self.assertIn(".ai/verification.md: present", context_text)
+            self.assertIn("## Plan Snapshot", context_text)
+            self.assertIn("## Verification Snapshot", context_text)
             self.assertIn("current_gate: diff", handoff_text)
+            self.assertIn(".ai/verification.md: present", handoff_text)
+            self.assertIn("## Plan Snapshot", handoff_text)
+            self.assertIn("## Verification Snapshot", handoff_text)
             self.assertIn(".ai/reviews/diff-review.md", context_text)
+
+    def test_large_handoff_mentions_spec_plan_and_verification_summary(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
+            tmpdir = Path(tmp)
+            self.assertEqual(self.run_git(tmpdir, "init").returncode, 0)
+            self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-init"), "small").returncode, 0)
+            self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-upgrade"), "large").returncode, 0)
+            self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "spec").returncode, 0)
+            self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-approve"), "spec").returncode, 0)
+            self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "plan").returncode, 0)
+            self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-approve"), "plan").returncode, 0)
+            (tmpdir / ".ai" / "verification.md").write_text(
+                "# Verification\n\n## Ran\n\n- command: py tests/test_ai_init_small.py\n- result: passed\n- notes: smoke\n\n## Not Run\n\n- item: py tests/test_e2e_workflow.py\n- reason: deferred\n- required follow-up: run before final approval\n",
+                encoding="utf-8",
+            )
+
+            handoff = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-handoff"), "--force")
+            self.assertEqual(handoff.returncode, 0, handoff.stderr)
+            handoff_text = (tmpdir / ".ai" / "handoff.md").read_text(encoding="utf-8")
+            self.assertIn("- spec approved", handoff_text)
+            self.assertIn("- plan approved", handoff_text)
+            self.assertIn("py tests/test_ai_init_small.py -> passed", handoff_text)
+            self.assertIn("py tests/test_e2e_workflow.py", handoff_text)
 
     def test_approve_then_handoff_mentions_approval(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:

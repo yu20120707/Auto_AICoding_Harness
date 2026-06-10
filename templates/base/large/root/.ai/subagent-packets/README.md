@@ -10,8 +10,10 @@ They do not start subagents, install skills, approve gates, or replace `.ai/stat
 
 1. Pick the role packet that matches the needed work.
 2. Fill in the required context with exact files, docs, diffs, and constraints.
-3. Give the packet to the worker agent or use it yourself as the role contract.
-4. Write the returned evidence into `.ai/run-trace.md`, `.ai/reviews/`, `.ai/evaluation.md`, `.ai/context-pack.md`, or `.ai/handoff.md` as appropriate.
+3. Copy the packet's `Required Skills` and `Optional Skills` explicitly into the real dispatch request.
+4. Record the dispatch in `.ai/run-trace.md` with role, scope, required skills, optional skills, objective, and result location.
+5. Give the packet to the worker agent or use it yourself as the role contract.
+6. Write the returned evidence into `.ai/run-trace.md`, `.ai/reviews/`, `.ai/evaluation.md`, `.ai/context-pack.md`, or `.ai/handoff.md` as appropriate.
 
 ## Roles
 

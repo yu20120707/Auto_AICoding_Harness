@@ -11,6 +11,7 @@
 - `ai-upgrade large`
 - `ai-status`
 - `ai-state`
+- `ai-dispatch`
 - `ai-review diff`
 - `ai-review spec`
 - `ai-review plan`
@@ -48,6 +49,11 @@
 - keeps local C++ / Linux / backend / system guidance in one profile-oriented skill
 - maps large-mode subagent roles to recommended global skills
 - adds large-mode `.ai/subagent-packets/` templates for role-specific context passing
+- adds large-mode `.ai/verification.md` as a dedicated verification evidence ledger
+- adds generated `docs/ai/workflow.md` as a durable execution contract for target projects
+- adds `ai-dispatch` as a thin helper that expands role-to-skill mapping into `.ai/run-trace.md`
+- uses `.ai/run-trace.md` as the canonical dispatch log when large-mode subagents are actually used
+- requires explicit role-to-skill mapping in that dispatch log when real subagents are used
 - keeps subagents as enhancement templates, not execution logic
 - keeps subagent task packets as prompt/context artifacts, not an automatic runner
 - small mode does not depend on subagents
@@ -78,6 +84,7 @@ ai-install-skills
 
 ai-init small
   -> ai-upgrade large
+  -> ai-dispatch <role> --scope ... --objective ... --expected-output ... --result-location ...
   -> ai-review spec
   -> ai-approve spec / ai-reject spec
   -> ai-review plan
@@ -102,8 +109,9 @@ ai-init small
 - `ai-approve diff` can move state to `DIFF_APPROVED`
 - `ai-reject diff` can move state to `NEEDS_FIX`
 - `ai-review final` can move state to `WAITING_HUMAN_FINAL_APPROVAL`
-- `ai-approve final` can move state to `DONE`
+- `ai-approve final` can move state to `DONE` after review material exists and `.ai/verification.md` contains recorded command evidence
 - `ai-reject final` can move state to `NEEDS_MORE_TESTS`
+- `ai-dispatch` appends to `.ai/run-trace.md` and does not advance state
 - `ai-context-pack` does not advance state
 - `ai-handoff` does not advance state
 - `ai-state` reads state and does not advance state
@@ -126,9 +134,11 @@ No third-party runtime dependencies.
 - `tests/test_ai_upgrade_large.py`: small-to-large upgrade, repeated upgrade behavior, `--force` backup, large-mode status
 - `tests/test_ai_review_diff.py`: diff review preconditions, git requirements, review artifact generation, state transition to `WAITING_HUMAN_DIFF_APPROVAL`
 - `tests/test_ai_review_spec_plan_final.py`: spec/plan/final review artifact generation, waiting-gate transitions, skip and `--force` behavior, and `ai-status` visibility
+- `tests/test_examples.py`: committed example structure including workflow guidance and large-mode verification scaffold
 - `tests/test_ai_approve_reject_diff.py`: diff approve/reject preconditions, state transitions to `DIFF_APPROVED` and `NEEDS_FIX`, skip and `--force` behavior
 - `tests/test_ai_approve_reject_all_gates.py`: spec/plan/final/diff approve-reject coverage, gate mismatch failures, missing review failures, skip and `--force` behavior, and final state visibility
 - `tests/test_ai_context_handoff.py`: context-pack and handoff generation, no state advancement, review/approval visibility, skip and `--force` behavior
+- `tests/test_ai_dispatch.py`: large-mode dispatch logging, packet skill expansion, and mode/precondition failures
 - `tests/test_current_capabilities.py`: command entrypoint manifest, README support surface, explicit capability declarations, and current baseline markers
 - `tests/test_cpp_profile_templates.py`: profile overlay docs generation, keyword coverage, and safe placeholder script content
 - `tests/test_examples.py`: committed small and large example structure without runtime noise

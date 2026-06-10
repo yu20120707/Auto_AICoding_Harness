@@ -76,8 +76,9 @@ If `.ai/state.json` does not exist, the target repository is `UNINITIALIZED`.
 - `ai-approve diff` can move state to `DIFF_APPROVED`
 - `ai-reject diff` can move state to `NEEDS_FIX`
 - `ai-review final` can move state to `WAITING_HUMAN_FINAL_APPROVAL`
-- `ai-approve final` can move state to `DONE`
+- `ai-approve final` can move state to `DONE` only after meaningful `.ai/verification.md` evidence exists
 - `ai-reject final` can move state to `NEEDS_MORE_TESTS`
+- `ai-dispatch` does not advance state
 - `ai-context-pack` does not advance state
 - `ai-handoff` does not advance state
 - `state.json` is not a review database
