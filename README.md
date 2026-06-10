@@ -13,6 +13,13 @@
 - 把常用 AI coding 方法论沉淀成全局 skills。
 - 根据任务复杂度在轻量流程和 large mode 流程之间切换。
 
+## 用户使用场景
+
+- 你有自己的本地 agent，但希望它在不同项目里都按同一套工程习惯做事，而不是每次从零约束。
+- 你接手一个已有仓库，想先把任务分级、验证方式、handoff 方式和 review gate 统一下来，再让 agent 开始干活。
+- 你希望复杂任务不再只靠一段聊天推进，而是有 `spec / plan / review / verification / handoff` 这些可落地的项目内文件。
+- 你想让 subagent 协作更可控，至少把角色、skills、scope、expected output 记录清楚，而不是只写一句“你去看一下”。
+
 ## 不做什么
 
 - 不自动接管业务源码。
@@ -54,6 +61,48 @@ bin/ai-status
 bin/ai-init small
 ```
 
+## 拉库后先对本地 Agent 说什么
+
+如果你刚把仓库拉下来，最省事的做法不是自己手工翻目录，而是先让本地 agent 做一次“本地化适配”。
+
+可以直接把下面这段话发给它：
+
+```text
+你现在把这个仓库当作 AI coding harness 源仓库来接入你自己。
+
+先阅读：
+- README.md
+- docs/install-targets.md
+- prompts/bootstrap-local-agent.md
+- global/AGENTS.md.template
+- skills/README.md
+
+然后只按你当前真实支持的环境做本地化适配：
+- 识别你现在是 Codex、Claude Code、GitHub Copilot / VS Code，还是别的本地 agent
+- 只安装你真正能消费的全局指令和 skills
+- 不要静默覆盖已有配置；如果目标文件已存在，先给出 diff、dry-run 或备份方案
+
+最后告诉我：
+- 你安装了哪些文件
+- 跳过了哪些文件
+- 还需要我做什么重启、reload 或手工确认
+```
+
+如果你已经进入某个业务项目，想把这套流程注入进去，可以再对 agent 说：
+
+```text
+把当前项目接入 Auto_AICoding_Harness 工作流。
+
+先检查项目根目录是否已经有 AGENTS.md、docs/ai/ 和 .ai/state.json。
+如果还没有，按仓库说明执行 ai-init small。
+如果已经存在，就先读取现有 AGENTS.md 和 docs/ai/*，不要覆盖用户已有约束。
+
+然后告诉我：
+- 当前项目是否已接入
+- 下一步应该保持 small mode，还是建议升级 large mode
+- 如果升级，原因是什么
+```
+
 ## 推荐使用流程
 
 1. 拉取本仓库。
@@ -64,6 +113,26 @@ bin/ai-init small
 6. 复杂任务执行 `ai-upgrade large`，启用 spec / plan / review / approval / handoff 骨架。
 7. 如果真的要派发 subagent，先运行 `ai-dispatch`，把角色包里的 skill 显式展开并记录进 `.ai/run-trace.md`。
 8. 用 `ai-status` 查看当前状态。
+
+## 什么时候升级到 Large Mode
+
+保持 `small` 就够的情况：
+
+- 修一个局部 bug。
+- 改一个脚本、prompt、配置或少量文档。
+- 回滚成本低，当前会话里能很快验证。
+
+建议升级到 `large` 的情况：
+
+- 任务已经跨模块、跨流程，或者会影响共享接口。
+- 你需要先写 `spec` 和 `plan`，不想让 agent 直接边想边改。
+- 任务可能跨多个 session，需要 `context-pack`、`handoff`、`verification` 这些运行痕迹。
+- 你准备做显式 review gate，或者确实要做带角色边界的 subagent 协作。
+
+一句话判断：
+
+- “直接改，改完很快就能验” -> 多半继续 `small`
+- “需要先控范围、留痕、分阶段审” -> 升到 `large`
 
 ## 当前能力
 
