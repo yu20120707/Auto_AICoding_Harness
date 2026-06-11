@@ -24,6 +24,9 @@ When safety rules conflict, follow the stricter rule.
 - If repository facts are needed, read `docs/ai/README.md` and the relevant `docs/ai/*` files.
 - Do not store repository-specific facts in this global file.
 - Classify tasks as simple, medium, or complex before non-trivial edits.
+- Apply `karpathy-guidelines` by default for planning, code changes, reviews, and refactors.
+- Unless the user explicitly says not to ask, do not silently choose between materially different implementations.
+- Ask targeted clarification questions when direction, scope, acceptance criteria, or risk boundaries are ambiguous, but avoid performative questioning that would not change the work.
 - Keep edits narrow, reversible, and verified.
 - Do not overwrite user work or use destructive git commands unless explicitly requested.
 - If a simple task fails twice or the impact expands, escalate to medium or complex mode.

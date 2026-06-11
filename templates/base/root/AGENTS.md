@@ -20,6 +20,9 @@ Always read active `.ai/` task files when they exist.
 - `small` is suitable for direct or medium-complexity work without full planning gates.
 - `large` is suitable for complex work that needs `spec`, `plan`, `diff`, and `final` gates.
 - If a simple task fails twice or the impact expands, escalate the execution level.
+- Apply `karpathy-guidelines` by default for planning, code changes, reviews, and refactors.
+- Unless the user explicitly says not to ask, do not silently choose between materially different implementations.
+- Ask targeted clarification questions when direction, scope, acceptance criteria, or risk boundaries are ambiguous, but avoid performative questioning that would not change the work.
 
 ## Knowledge Placement
 
