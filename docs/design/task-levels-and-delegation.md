@@ -24,6 +24,7 @@ Use medium mode when the task spans multiple files or one bounded workflow but d
 - optional scanner or reviewer subagent
 - short plan and run trace are enough
 - no mandatory spec / plan / final approval gates
+- the built-in `ai-dispatch` helper remains `large`-only because role packets are only generated in the large scaffold
 - escalate to complex if scope expands, rollback becomes hard, or validation becomes uncertain
 
 ### Complex
@@ -42,7 +43,7 @@ Multi-agent is an execution strategy.
 State-machine documents are a risk-control strategy.
 
 - simple usually uses neither
-- medium may use subagents without full state-machine gates
+- medium may use subagents without full state-machine gates, but may need manual coordination instead of the built-in dispatch helper
 - complex usually uses both
 
 ## Escalation Triggers

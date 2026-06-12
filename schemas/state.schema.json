@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Auto_AICoding_Harness State",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "mode",
+    "profile",
+    "status",
+    "current_gate",
+    "approved_gates",
+    "created_by",
+    "task_id",
+    "task_title",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["small", "medium", "large"]
+    },
+    "profile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "INIT",
+        "WAITING_HUMAN_SPEC_APPROVAL",
+        "SPEC_APPROVED",
+        "WAITING_HUMAN_PLAN_APPROVAL",
+        "PLAN_APPROVED",
+        "WAITING_HUMAN_DIFF_APPROVAL",
+        "DIFF_APPROVED",
+        "WAITING_HUMAN_FINAL_APPROVAL",
+        "DONE",
+        "NEEDS_REPLAN",
+        "NEEDS_FIX",
+        "NEEDS_MORE_TESTS"
+      ]
+    },
+    "current_gate": {
+      "type": ["string", "null"],
+      "enum": ["spec", "plan", "diff", "final", null]
+    },
+    "approved_gates": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["spec", "plan", "diff", "final"]
+      },
+      "uniqueItems": true
+    },
+    "created_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": true
+}

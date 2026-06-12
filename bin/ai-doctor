@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+import sys
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from core.doctor import collect_doctor_report
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Diagnose harness state and generated artifact consistency.")
+    parser.add_argument("--json", action="store_true", help="emit JSON instead of the human-readable report")
+    return parser.parse_args()
+
+
+def main() -> int:
+    try:
+        args = parse_args()
+        report = collect_doctor_report(Path.cwd())
+        if args.json:
+            print(json.dumps(report, indent=2))
+        else:
+            for check in report["checks"]:
+                print(f"[{check['status']}] {check['message']}")
+            print("")
+            print("Next action:")
+            print(f"  {report['next_action']}")
+        return 1 if report["has_failures"] else 0
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

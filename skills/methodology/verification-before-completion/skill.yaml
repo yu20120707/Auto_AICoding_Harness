@@ -1,0 +1,15 @@
+name: verification-before-completion
+scope: system
+version: 1
+install_default: true
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Prevent false completion by requiring fresh build, test, check, or documented not-run evidence.
+triggers:
+  - final verification
+  - completion check
+  - evidence review
+  - done claim

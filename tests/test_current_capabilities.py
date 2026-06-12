@@ -18,6 +18,7 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
             "ai-install-skills",
             "ai-init",
             "ai-upgrade",
+            "ai-doctor",
             "ai-status",
             "ai-state",
             "ai-dispatch",
@@ -33,6 +34,8 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
         self.assertTrue(RELEASE_CHECKLIST_PATH.exists())
         self.assertTrue(USAGE_WALKTHROUGH_PATH.exists())
         self.assertTrue(TARGET_STRUCTURE_PATH.exists())
+        self.assertTrue((REPO_ROOT / "docs" / "design" / "architecture.md").exists())
+        self.assertTrue((REPO_ROOT / "docs" / "design" / "decision-records.md").exists())
         self.assertFalse((REPO_ROOT / "README.zh-CN.md").exists())
 
     def test_readme_exposes_phase16_command_surface(self) -> None:
@@ -40,8 +43,11 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
         for command in [
             "ai-install-skills",
             "ai-init small",
+            "ai-init medium",
+            "ai-upgrade medium",
             "ai-upgrade large",
             "ai-status",
+            "ai-doctor",
             "ai-state",
             "ai-dispatch",
             "ai-review spec / plan / diff / final",
@@ -75,6 +81,8 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
         self.assertIn("ai-review final", combined)
         self.assertIn("ai-approve spec", combined)
         self.assertIn("ai-reject final", combined)
+        self.assertIn("supports `medium` as a bounded execution level", combined)
+        self.assertIn("docs/ai/tasks/<task-id>/", combined)
         self.assertIn("does not advance state", combined)
         self.assertIn("enhancement templates", combined)
         self.assertIn("cpp-linux-backend-system", combined)
@@ -124,18 +132,23 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
 
     def test_bootstrap_and_adapter_docs_exist(self) -> None:
         for path in [
+            "system/AGENTS.global.md",
             "global/AGENTS.md.template",
             "prompts/bootstrap-local-agent.md",
             "docs/install-targets.md",
             "docs/design/platform-adapters.md",
             "docs/design/task-levels-and-delegation.md",
             "docs/design/subagent-packets.md",
+            "core/profile.py",
+            "profiles/cpp-linux-backend-system/profile.yaml",
+            "schemas/profile.schema.json",
         ]:
             self.assertTrue((REPO_ROOT / path).exists(), path)
 
         combined = "\n".join(
             (REPO_ROOT / path).read_text(encoding="utf-8")
             for path in [
+                "system/AGENTS.global.md",
                 "global/AGENTS.md.template",
                 "prompts/bootstrap-local-agent.md",
                 "docs/install-targets.md",

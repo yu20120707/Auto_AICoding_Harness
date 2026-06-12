@@ -1,0 +1,15 @@
+name: systematic-debugging
+scope: system
+version: 1
+install_default: true
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Diagnose failures through reproduction, evidence, root-cause isolation, minimal fix, and validation.
+triggers:
+  - failing test
+  - build failure
+  - unexpected behavior
+  - root cause analysis

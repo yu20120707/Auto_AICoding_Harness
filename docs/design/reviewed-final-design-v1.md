@@ -23,7 +23,7 @@ The system is split into:
 
 ## Core Owns
 
-- `small / large` mode semantics
+- `small / medium / large` mode semantics
 - review-gate rules
 - handoff and context-pack contracts
 - command contracts
@@ -39,12 +39,13 @@ The system is split into:
 - build, test, and check expectations
 - engineering overlays for prompts, skills, and generated docs
 - profile-specific target-project templates
+- profile metadata such as languages, domains, risk triggers, and verification defaults
 
 `profile` must not redefine the workflow state machine or bypass review gates.
 
 ## Mode Model
 
-`small` and `large` are different control strengths on one workflow.
+`small`, `medium`, and `large` are different control strengths on one workflow.
 
 `small`:
 
@@ -54,10 +55,18 @@ The system is split into:
 - current implementation realizes `spec`, `plan`, `diff`, and `final` review / approve / reject
 - may skip `context-pack` and `handoff`
 
+`medium`:
+
+- current implementation adds `.ai/implementation-plan.md`, `.ai/run-trace.md`, and `.ai/verification.md`
+- keeps the same state shape as `small` and `large`
+- does not enforce the `spec -> plan -> diff -> final` chain
+- may use bounded reviewer/scanner coordination without the full large scaffold
+
 `large`:
 
 - design target requires `spec`, `plan`, `diff`, and `final`
-- current implementation realizes `spec`, `plan`, `diff`, and `final` gate chains
+- current implementation realizes `spec`, `plan`, `diff`, and `final` gate chains with enforced ordering
+- current implementation now also syncs a task-scoped evidence chain under `docs/ai/tasks/<task-id>/`
 - treats `context-pack` and `handoff` as standard capabilities
 - may use `subagent` and `skills`
 - must remain executable without them
@@ -92,6 +101,7 @@ In this harness repository:
 - overwrite result with `--force`: `OVERWRITTEN`
 - overwrite requires `--force`
 - `--force` must back up each overwritten file into target-project `.ai/backups/<timestamp>/`
+- overwrite backup metadata should remain inspectable through a manifest under the same backup root
 - no default delete behavior
 - no writes to business source code or business directories
 

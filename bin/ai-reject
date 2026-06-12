@@ -22,6 +22,7 @@ from core.state import (
     update_state_for_diff_rejected,
     write_state_payload,
 )
+from core.state_machine import assert_waiting_gate_for_decision
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Reject a harness gate decision.")
@@ -39,10 +40,7 @@ def require_waiting_gate(target_root: Path, gate: str) -> dict:
     state = load_state(target_root)
     if state is None:
         raise RuntimeError("target repository is not initialized: missing .ai/state.json")
-    if state.get("status") != config.waiting_status:
-        raise RuntimeError(f"current status does not allow {gate} rejection: {state.get('status')}")
-    if state.get("current_gate") != gate:
-        raise RuntimeError(f"current gate does not allow {gate} rejection: {state.get('current_gate')}")
+    assert_waiting_gate_for_decision(state, gate, action="rejection")
     if not (target_root / config.review_path).exists():
         raise RuntimeError(f"missing required review material: {config.review_path.as_posix()}")
     return state

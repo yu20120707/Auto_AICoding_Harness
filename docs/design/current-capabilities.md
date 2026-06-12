@@ -8,7 +8,10 @@
 
 - `ai-install-skills`
 - `ai-init small`
+- `ai-init medium`
+- `ai-upgrade medium`
 - `ai-upgrade large`
+- `ai-doctor`
 - `ai-status`
 - `ai-state`
 - `ai-dispatch`
@@ -35,10 +38,14 @@
 - keeps skills in repository-level `skills/` as portable skill sources
 - keeps `ai-install-skills` as a Codex example installer into `$CODEX_HOME/skills` or `~/.codex/skills`
 - supports `ai-install-skills --dry-run` for install inspection without writes
+- supports `ai-install-skills --list` for manifest inspection without writes
+- supports `ai-install-skills --scope` and `--profile` for subset selection
 - supports `--force` install refresh with backup under `skill-backups/<timestamp>/`
+- records installed skill metadata in an installed-skills manifest outside target projects
 - keeps `skill-creator` for maintaining `skills/**/SKILL.md`
 - keeps a single Chinese `README.md`
 - adds `global/AGENTS.md.template` for user-level behavior guidance
+- adds `system/AGENTS.global.md` as the system-layer global behavior source
 - adds `prompts/bootstrap-local-agent.md` for local-agent self-install guidance
 - adds `docs/install-targets.md`
 - adds `docs/design/platform-adapters.md`
@@ -63,6 +70,15 @@
 - does not automatically install skills or global instructions during `git clone`
 - does not fetch third-party skills during installation
 - supports `ai-state` as a thin machine-readable state output
+- supports `ai-doctor` as a consistency check for state and generated medium/large-mode files
+- makes `ai-status` show next-action guidance
+- supports `medium` as a bounded execution level between `small` and `large`
+- lets `ai-init medium` create a lightweight plan / trace / verification scaffold without entering the full large gate chain
+- makes `ai-upgrade large` print transition evidence and the next recommended step
+- syncs large-mode evidence into `docs/ai/tasks/<task-id>/` so the task chain is durable outside runtime-only files
+- enforces the `spec -> plan -> diff -> final` review chain in `large` mode
+- adds `core/command_policy.py` as the code-level command permission contract
+- adds `core/profile.py`, `profiles/<name>/profile.yaml`, and `schemas/profile.schema.json` so profile selection is validated instead of remaining prose-only
 
 ## Phase 17 Scope
 
@@ -79,11 +95,24 @@
 
 ```text
 ai-install-skills
-  -> installs repository-owned skills into Codex as an example installer
-  -> can run with --dry-run before writing files
+  -> installs a manifest-selected subset into Codex as an example installer
+  -> can run with --dry-run or --list before writing files
 
 ai-init small
+  -> ai-upgrade medium
   -> ai-upgrade large
+  -> ai-status / ai-doctor
+
+ai-init medium
+  -> ai-status / ai-doctor
+  -> ai-review diff
+  -> ai-approve diff / ai-reject diff
+  -> ai-context-pack
+  -> ai-handoff
+
+ai-init small|medium
+  -> ai-upgrade large
+  -> ai-status / ai-doctor
   -> ai-dispatch <role> --scope ... --objective ... --expected-output ... --result-location ...
   -> ai-review spec
   -> ai-approve spec / ai-reject spec
@@ -111,10 +140,15 @@ ai-init small
 - `ai-review final` can move state to `WAITING_HUMAN_FINAL_APPROVAL`
 - `ai-approve final` can move state to `DONE` after review material exists and `.ai/verification.md` contains recorded command evidence
 - `ai-reject final` can move state to `NEEDS_MORE_TESTS`
+- `ai-review plan` in `large` mode requires `spec` approval first
+- `ai-review diff` in `large` mode requires `plan` approval first
+- `ai-review final` in `large` mode requires `diff` approval first
+- `medium` keeps the same state shape but does not enforce the large-mode gate ordering
 - `ai-dispatch` appends to `.ai/run-trace.md` and does not advance state
 - `ai-context-pack` does not advance state
 - `ai-handoff` does not advance state
 - `ai-state` reads state and does not advance state
+- `ai-doctor` reads state and generated files and does not advance state
 
 ## Explicitly Not Implemented
 
@@ -130,8 +164,12 @@ No third-party runtime dependencies.
 ## Test Coverage
 
 - `tests/test_ai_init_small.py`: small-mode init, default skip behavior, `--force` backup, `ai-status`, exit codes
+- `tests/test_ai_init_medium.py`: medium-mode init, state shape, medium scaffold, and status guidance
 - `tests/test_ai_state.py`: machine-readable initialized and uninitialized state output plus argument errors
+- `tests/test_ai_upgrade_medium.py`: small-to-medium and medium-to-large upgrade paths plus repeated-upgrade behavior
 - `tests/test_ai_upgrade_large.py`: small-to-large upgrade, repeated upgrade behavior, `--force` backup, large-mode status
+- `tests/test_e2e_workflow.py`: full mainline workflow from `UNINITIALIZED` to `DONE`, including large task-chain artifacts
+- `tests/test_ai_review_medium.py`: medium-mode `plan` and `final` review behavior without a large-mode `spec` prerequisite
 - `tests/test_ai_review_diff.py`: diff review preconditions, git requirements, review artifact generation, state transition to `WAITING_HUMAN_DIFF_APPROVAL`
 - `tests/test_ai_review_spec_plan_final.py`: spec/plan/final review artifact generation, waiting-gate transitions, skip and `--force` behavior, and `ai-status` visibility
 - `tests/test_examples.py`: committed example structure including workflow guidance and large-mode verification scaffold
@@ -139,9 +177,11 @@ No third-party runtime dependencies.
 - `tests/test_ai_approve_reject_all_gates.py`: spec/plan/final/diff approve-reject coverage, gate mismatch failures, missing review failures, skip and `--force` behavior, and final state visibility
 - `tests/test_ai_context_handoff.py`: context-pack and handoff generation, no state advancement, review/approval visibility, skip and `--force` behavior
 - `tests/test_ai_dispatch.py`: large-mode dispatch logging, packet skill expansion, and mode/precondition failures
+- `tests/test_ai_doctor.py`: doctor diagnostics for missing state, medium acceptance, incomplete large scaffolds, mode mismatch, and JSON output
 - `tests/test_current_capabilities.py`: command entrypoint manifest, README support surface, explicit capability declarations, and current baseline markers
+- `tests/test_safe_write.py`: path safety, overwrite manifest, and symlink-escape hardening
+- `tests/test_state_machine.py`: state validation, waiting-gate enforcement, medium permissiveness, and large-mode gate ordering
 - `tests/test_cpp_profile_templates.py`: profile overlay docs generation, keyword coverage, and safe placeholder script content
 - `tests/test_examples.py`: committed small and large example structure without runtime noise
-- `tests/test_e2e_workflow.py`: full mainline workflow from `UNINITIALIZED` to `DONE`
 - `tests/test_subagent_templates.py`: large-mode subagent role template generation, keyword coverage, and safe-write behavior
 - `tests/test_skill_templates.py`: portable skill source validation, install behavior, backup behavior, provenance coverage, onboarding/routing skills, subagent routing guidance, and keyword coverage

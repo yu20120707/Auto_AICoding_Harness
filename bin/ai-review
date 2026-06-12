@@ -23,6 +23,8 @@ from core.state import (
     update_state_for_spec_review,
     write_state_payload,
 )
+from core.state_machine import assert_review_allowed
+from core.task_chain import sync_large_task_chain
 
 
 REVIEW_PATH = Path(".ai") / "reviews" / "diff-review.md"
@@ -52,6 +54,7 @@ def main() -> int:
         args = parse_args()
         target_root = Path.cwd()
         state = require_initialized_state(target_root)
+        assert_review_allowed(state, args.review_type)
         timestamp = datetime.now().astimezone().strftime("%Y%m%d-%H%M%S")
         skipped_message = "state unchanged; use --force to regenerate diff review"
 
@@ -69,10 +72,10 @@ def main() -> int:
         else:
             require_review_input_exists(target_root, args.review_type)
             artifact = {
-                "spec": build_spec_review(),
-                "plan": build_plan_review(),
-                "final": build_final_review(target_root),
-            }[args.review_type]
+                "spec": build_spec_review,
+                "plan": build_plan_review,
+                "final": lambda: build_final_review(target_root),
+            }[args.review_type]()
             review_result = safe_write_bytes(
                 target_root=target_root,
                 relative_path=artifact.relative_path,
@@ -104,6 +107,17 @@ def main() -> int:
             if state_result.backup_path is not None:
                 state_line += f" (backup: {state_result.backup_path.relative_to(target_root).as_posix()})"
             print(state_line)
+            sync_results = sync_large_task_chain(
+                target_root=target_root,
+                state=updated_state,
+                force=args.force,
+                timestamp=timestamp,
+            )
+            for sync_result in sync_results:
+                sync_line = f"{sync_result.action} {sync_result.path.relative_to(target_root).as_posix()}"
+                if sync_result.backup_path is not None:
+                    sync_line += f" (backup: {sync_result.backup_path.relative_to(target_root).as_posix()})"
+                print(sync_line)
         else:
             print(skipped_message)
 

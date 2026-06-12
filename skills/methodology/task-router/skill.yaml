@@ -1,0 +1,15 @@
+name: task-router
+scope: system
+version: 1
+install_default: true
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Choose the lightest safe workflow and decide when large-mode artifacts or subagents are warranted.
+triggers:
+  - task routing
+  - large mode
+  - delegation
+  - workflow selection

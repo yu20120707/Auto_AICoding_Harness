@@ -31,6 +31,13 @@ class AiReviewDiffIntegrationTest(unittest.TestCase):
             check=False,
         )
 
+    def rewrite_state(self, tmpdir: Path, *, status: str, current_gate: str | None) -> None:
+        state_path = tmpdir / ".ai" / "state.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["status"] = status
+        state["current_gate"] = current_gate
+        state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
     def test_review_fails_when_uninitialized(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             tmpdir = Path(tmp)
@@ -98,6 +105,7 @@ class AiReviewDiffIntegrationTest(unittest.TestCase):
 
             review_path = tmpdir / ".ai" / "reviews" / "diff-review.md"
             review_path.write_text("user modified\n", encoding="utf-8")
+            self.rewrite_state(tmpdir, status="INIT", current_gate=None)
 
             result = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "diff")
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -118,6 +126,7 @@ class AiReviewDiffIntegrationTest(unittest.TestCase):
 
             review_path = tmpdir / ".ai" / "reviews" / "diff-review.md"
             review_path.write_text("user modified\n", encoding="utf-8")
+            self.rewrite_state(tmpdir, status="INIT", current_gate=None)
 
             result = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "diff", "--force")
             self.assertEqual(result.returncode, 0, result.stderr)

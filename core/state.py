@@ -10,34 +10,46 @@ from core.safe_write import WriteResult, safe_write_bytes
 STATE_RELATIVE_PATH = Path(".ai") / "state.json"
 
 
-def default_state(profile: str) -> dict:
+def default_state(profile: str, *, mode: str = "small") -> dict:
     now = datetime.now().astimezone().isoformat(timespec="seconds")
+    if mode not in {"small", "medium", "large"}:
+        raise ValueError(f"unsupported mode: {mode}")
     return {
         "schema_version": 1,
-        "mode": "small",
+        "mode": mode,
         "profile": profile,
         "status": "INIT",
         "current_gate": None,
         "approved_gates": [],
         "created_by": "Auto_AICoding_Harness",
-        "task_id": "init-small",
-        "task_title": "Initialize harness in small mode",
+        "task_id": f"init-{mode}",
+        "task_title": f"Initialize harness in {mode} mode",
         "updated_at": now,
     }
 
 
+def upgrade_state_to_medium(existing_state: dict, profile: str) -> dict:
+    return _upgrade_state(existing_state, profile, mode="medium")
+
+
 def upgrade_state_to_large(existing_state: dict, profile: str) -> dict:
+    return _upgrade_state(existing_state, profile, mode="large")
+
+
+def _upgrade_state(existing_state: dict, profile: str, *, mode: str) -> dict:
     now = datetime.now().astimezone().isoformat(timespec="seconds")
     upgraded = dict(existing_state)
     upgraded.update(
         {
             "schema_version": 1,
-            "mode": "large",
+            "mode": mode,
             "profile": profile,
             "status": "INIT",
             "current_gate": None,
             "approved_gates": [],
             "created_by": "Auto_AICoding_Harness",
+            "task_id": f"init-{mode}",
+            "task_title": f"Initialize harness in {mode} mode",
             "updated_at": now,
         }
     )
@@ -163,10 +175,11 @@ def write_state(
     *,
     target_root: Path,
     profile: str,
+    mode: str = "small",
     force: bool,
     timestamp: str,
 ) -> WriteResult:
-    payload = json.dumps(default_state(profile), indent=2, ensure_ascii=True) + "\n"
+    payload = json.dumps(default_state(profile, mode=mode), indent=2, ensure_ascii=True) + "\n"
     return safe_write_bytes(
         target_root=target_root,
         relative_path=STATE_RELATIVE_PATH,

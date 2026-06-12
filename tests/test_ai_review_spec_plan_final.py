@@ -26,6 +26,36 @@ class AiReviewSpecPlanFinalIntegrationTest(unittest.TestCase):
         self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-init"), "small").returncode, 0)
         self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-upgrade"), "large").returncode, 0)
 
+    def approve_spec(self, tmpdir: Path) -> None:
+        self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "spec").returncode, 0)
+        self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-approve"), "spec").returncode, 0)
+
+    def approve_plan(self, tmpdir: Path) -> None:
+        self.approve_spec(tmpdir)
+        self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "plan").returncode, 0)
+        self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-approve"), "plan").returncode, 0)
+
+    def approve_diff(self, tmpdir: Path) -> None:
+        self.approve_plan(tmpdir)
+        self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-context-pack")).returncode, 0)
+        self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-handoff")).returncode, 0)
+        git_init = subprocess.run(["git", "init"], cwd=tmpdir, capture_output=True, text=True, check=False)
+        self.assertEqual(git_init.returncode, 0, git_init.stderr)
+        git_add = subprocess.run(["git", "add", "."], cwd=tmpdir, capture_output=True, text=True, check=False)
+        self.assertEqual(git_add.returncode, 0, git_add.stderr)
+        agents = tmpdir / "AGENTS.md"
+        agents.write_text(agents.read_text(encoding="utf-8") + "\nlocal change\n", encoding="utf-8")
+        self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "diff").returncode, 0)
+        self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-approve"), "diff").returncode, 0)
+
+    def rewrite_state(self, tmpdir: Path, *, status: str, current_gate: str | None, approved_gates: list[str]) -> None:
+        state_path = tmpdir / ".ai" / "state.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["status"] = status
+        state["current_gate"] = current_gate
+        state["approved_gates"] = approved_gates
+        state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
     def test_review_spec_plan_final_fail_when_uninitialized(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             tmpdir = Path(tmp)
@@ -54,6 +84,7 @@ class AiReviewSpecPlanFinalIntegrationTest(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             tmpdir = Path(tmp)
             self.prepare_large(tmpdir)
+            self.approve_spec(tmpdir)
 
             result = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "plan")
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -70,6 +101,7 @@ class AiReviewSpecPlanFinalIntegrationTest(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             tmpdir = Path(tmp)
             self.prepare_large(tmpdir)
+            self.approve_diff(tmpdir)
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-context-pack")).returncode, 0)
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-handoff")).returncode, 0)
 
@@ -94,6 +126,7 @@ class AiReviewSpecPlanFinalIntegrationTest(unittest.TestCase):
 
             review_path = tmpdir / ".ai" / "reviews" / "spec-review.md"
             review_path.write_text("user modified\n", encoding="utf-8")
+            self.rewrite_state(tmpdir, status="INIT", current_gate=None, approved_gates=[])
             state_before = (tmpdir / ".ai" / "state.json").read_text(encoding="utf-8")
 
             result = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "spec")
@@ -106,10 +139,12 @@ class AiReviewSpecPlanFinalIntegrationTest(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             tmpdir = Path(tmp)
             self.prepare_large(tmpdir)
+            self.approve_spec(tmpdir)
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "plan").returncode, 0)
 
             review_path = tmpdir / ".ai" / "reviews" / "plan-review.md"
             review_path.write_text("user modified\n", encoding="utf-8")
+            self.rewrite_state(tmpdir, status="SPEC_APPROVED", current_gate=None, approved_gates=["spec"])
 
             result = self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "plan", "--force")
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -123,6 +158,7 @@ class AiReviewSpecPlanFinalIntegrationTest(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             tmpdir = Path(tmp)
             self.prepare_large(tmpdir)
+            self.approve_diff(tmpdir)
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-context-pack")).returncode, 0)
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-handoff")).returncode, 0)
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "final").returncode, 0)

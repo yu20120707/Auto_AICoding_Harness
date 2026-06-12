@@ -11,7 +11,16 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from core.state import STATE_RELATIVE_PATH, load_state, upgrade_state_to_large, write_state_payload
+from core.state import (
+    STATE_RELATIVE_PATH,
+    load_state,
+    upgrade_state_to_large,
+    upgrade_state_to_medium,
+    write_state_payload,
+)
+from core.profile import load_profile
+from core.state_machine import assert_valid_state, next_action_for_state
+from core.task_chain import sync_large_task_chain
 from core.template import materialize_template_stage
 
 
@@ -20,7 +29,7 @@ DEFAULT_PROFILE = "cpp-linux-backend-system"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Upgrade a small target repository to large mode.")
-    parser.add_argument("mode", choices=["large"])
+    parser.add_argument("mode", choices=["medium", "large"])
     parser.add_argument("--force", action="store_true", help="overwrite managed large-mode files after backing them up")
     parser.add_argument(
         "--profile",
@@ -30,7 +39,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def require_initialized_small_or_large(target_root: Path) -> dict:
+def require_initialized_small_or_medium_or_large(target_root: Path) -> dict:
     required_paths = [
         target_root / STATE_RELATIVE_PATH,
         target_root / "AGENTS.md",
@@ -44,10 +53,11 @@ def require_initialized_small_or_large(target_root: Path) -> dict:
     state = load_state(target_root)
     if state is None:
         raise RuntimeError("target repository is not initialized: missing .ai/state.json")
+    assert_valid_state(state)
 
     mode = state.get("mode")
     status = state.get("status")
-    if mode not in {"small", "large"}:
+    if mode not in {"small", "medium", "large"}:
         raise RuntimeError(f"unsupported current mode: {mode}")
     if status != "INIT":
         raise RuntimeError(f"unsupported current status for upgrade: {status}")
@@ -59,21 +69,33 @@ def main() -> int:
     try:
         args = parse_args()
         target_root = Path.cwd()
-        state = require_initialized_small_or_large(target_root)
-        already_large = state.get("mode") == "large"
+        load_profile(REPO_ROOT, args.profile)
+        state = require_initialized_small_or_medium_or_large(target_root)
+        current_mode = state.get("mode")
+        if current_mode == "large" and args.mode == "medium":
+            raise RuntimeError("downgrade from large to medium is not supported")
+
+        already_target = current_mode == args.mode
 
         timestamp = datetime.now().astimezone().strftime("%Y%m%d-%H%M%S")
+        roots = {
+            "medium": ["base/medium/root", f"profiles/{args.profile}/medium/root"],
+            "large": ["base/large/root", f"profiles/{args.profile}/large/root"],
+        }[args.mode]
         results = materialize_template_stage(
             harness_root=REPO_ROOT,
             target_root=target_root,
             profile=args.profile,
             force=args.force,
             timestamp=timestamp,
-            roots=["base/large/root", f"profiles/{args.profile}/large/root"],
+            roots=roots,
         )
 
-        if not already_large:
-            upgraded_state = upgrade_state_to_large(state, args.profile)
+        if not already_target:
+            upgraded_state = {
+                "medium": upgrade_state_to_medium,
+                "large": upgrade_state_to_large,
+            }[args.mode](state, args.profile)
             results.append(
                 write_state_payload(
                     target_root=target_root,
@@ -82,14 +104,30 @@ def main() -> int:
                     timestamp=timestamp,
                 )
             )
+            state = upgraded_state
         elif not args.force:
-            print("ALREADY_LARGE")
+            print(f"ALREADY_{args.mode.upper()}")
 
+        if state.get("mode") == "large":
+            results.extend(
+                sync_large_task_chain(
+                    target_root=target_root,
+                    state=state,
+                    force=args.force,
+                    timestamp=timestamp,
+                )
+            )
+
+        print(f"[OK] Current mode before upgrade: {current_mode}")
+        print(f"[OK] Upgrade target: {args.mode}")
         for result in results:
             line = f"{result.action} {result.path.relative_to(target_root).as_posix()}"
             if result.backup_path is not None:
                 line += f" (backup: {result.backup_path.relative_to(target_root).as_posix()})"
             print(line)
+        print(f"[OK] Current mode is now {state.get('mode')}")
+        print("Next action:")
+        print(f"  {next_action_for_state(state)}")
 
         return 0
     except Exception as exc:

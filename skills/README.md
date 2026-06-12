@@ -24,6 +24,22 @@ Current skill groups:
 
 ## Skill Manifest
 
+Every live skill directory contains both:
+
+- `SKILL.md`: the reusable instruction artifact
+- `skill.yaml`: manifest metadata for default installs, `--scope`, `--profile`, `--list`, and the installed-skills manifest
+
+`skill.yaml` currently declares:
+
+- `name`
+- `scope`
+- `version`
+- `install_default`
+- `platforms`
+- `summary`
+- `triggers`
+- optional `profile`
+
 Methodology skills:
 
 - `methodology/karpathy-guidelines`: keep code changes simple, scoped, assumption-aware, and verified.

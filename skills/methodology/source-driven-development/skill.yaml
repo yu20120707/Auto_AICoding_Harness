@@ -1,0 +1,15 @@
+name: source-driven-development
+scope: system
+version: 1
+install_default: false
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Ground framework or library decisions in current official documentation and source-cited implementation choices.
+triggers:
+  - official docs
+  - framework verification
+  - source citations
+  - version-sensitive code

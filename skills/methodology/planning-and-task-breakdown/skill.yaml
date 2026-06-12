@@ -1,0 +1,15 @@
+name: planning-and-task-breakdown
+scope: system
+version: 1
+install_default: true
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Decompose larger requirements into ordered, verifiable tasks with clear dependencies and acceptance checks.
+triggers:
+  - task breakdown
+  - implementation plan
+  - sequencing
+  - parallel work

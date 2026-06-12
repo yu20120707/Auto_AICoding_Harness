@@ -45,13 +45,20 @@ class AiUpgradeLargeIntegrationTest(unittest.TestCase):
             for path in [
                 ".ai/epic.md",
                 ".ai/implementation-plan.md",
+                ".ai/tech-design.md",
                 ".ai/run-trace.md",
                 ".ai/verification.md",
+                ".ai/risk-and-rollback.md",
                 ".ai/reviews",
                 ".ai/approvals",
                 ".ai/subagent-packets/README.md",
                 ".ai/subagent-packets/planner.md",
                 ".ai/subagent-packets/reviewer.md",
+                "docs/ai/tasks/README.md",
+                "docs/ai/tasks/init-large/00-prd.md",
+                "docs/ai/tasks/init-large/01-spec.md",
+                "docs/ai/tasks/init-large/02-tech-design.md",
+                "docs/ai/tasks/init-large/03-implementation-plan.md",
             ]:
                 self.assertTrue((tmpdir / path).exists(), path)
 
@@ -101,6 +108,8 @@ class AiUpgradeLargeIntegrationTest(unittest.TestCase):
             self.assertIn("large files: present", status.stdout)
             self.assertIn("reviews dir: present", status.stdout)
             self.assertIn("approvals dir: present", status.stdout)
+            self.assertIn("task_chain: present (docs/ai/tasks/init-large)", status.stdout)
+            self.assertIn("next_action: Run ai-review spec", status.stdout)
 
 
 if __name__ == "__main__":

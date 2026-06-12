@@ -92,6 +92,10 @@ class CppProfileTemplatesIntegrationTest(unittest.TestCase):
         self.assertIn("ai-install-skills", combined)
         self.assertIn("verification matrix", combined.lower())
 
+    def test_profile_metadata_files_exist(self) -> None:
+        self.assertTrue((REPO_ROOT / "profiles" / "cpp-linux-backend-system" / "profile.yaml").exists())
+        self.assertTrue((REPO_ROOT / "schemas" / "profile.schema.json").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

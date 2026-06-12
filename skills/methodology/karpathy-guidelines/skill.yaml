@@ -1,0 +1,15 @@
+name: karpathy-guidelines
+scope: system
+version: 1
+install_default: true
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Keep code changes simple, surgical, assumption-aware, and explicitly verifiable.
+triggers:
+  - implementation
+  - refactor
+  - review
+  - scope control

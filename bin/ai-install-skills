@@ -10,20 +10,51 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from core.skill_install import default_skills_dest, install_all_skills
+from core.skill_install import (
+    default_install_manifest_path,
+    default_skills_dest,
+    discover_skill_manifests,
+    install_all_skills,
+    select_skill_manifests,
+    write_install_manifest,
+)
+from core.profile import load_profile
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Install all Auto_AICoding_Harness skills into the Codex global skills directory."
+        description="Install a manifest-selected subset of Auto_AICoding_Harness skills into the Codex global skills directory."
     )
     parser.add_argument("--force", action="store_true", help="overwrite existing global skills after backing them up")
     parser.add_argument("--dry-run", action="store_true", help="show planned skill install actions without writing files")
+    parser.add_argument("--list", action="store_true", help="list the selected skill manifests without writing files")
+    parser.add_argument(
+        "--scope",
+        action="append",
+        choices=["system", "profile"],
+        help="restrict installation to a manifest scope; repeat for multiple scopes",
+    )
+    parser.add_argument(
+        "--profile",
+        help="include skills whose manifest profile matches this value, for example cpp-linux-backend-system",
+    )
+    parser.add_argument(
+        "--platform",
+        default="codex",
+        choices=["codex", "claude-code", "copilot", "generic"],
+        help="manifest platform filter (default: codex)",
+    )
     parser.add_argument(
         "--dest",
         type=Path,
         default=default_skills_dest(),
         help="Codex skills destination directory (default: $CODEX_HOME/skills or ~/.codex/skills)",
+    )
+    parser.add_argument(
+        "--manifest-path",
+        type=Path,
+        default=default_install_manifest_path(),
+        help="where to write the installation manifest on real installs",
     )
     return parser.parse_args()
 
@@ -31,16 +62,53 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     try:
         args = parse_args()
+        if args.platform != "codex" and not args.list:
+            raise RuntimeError("automatic install is only implemented for codex; use --list for other platforms")
+        if args.profile:
+            load_profile(REPO_ROOT, args.profile)
+        skills_root = REPO_ROOT / "skills"
+        manifests = discover_skill_manifests(skills_root)
+        selected = select_skill_manifests(
+            manifests=manifests,
+            platform=args.platform,
+            scopes=set(args.scope or []),
+            profile=args.profile,
+        )
+        if args.list:
+            print(f"surface: {args.platform} manifest selection")
+            print(f"selected_skills: {len(selected)}")
+            for manifest in selected:
+                profile_text = f" profile={manifest.profile}" if manifest.profile else ""
+                print(
+                    f"{manifest.name} scope={manifest.scope}{profile_text} install_default={str(manifest.install_default).lower()}"
+                )
+            return 0
+
         results = install_all_skills(
-            skills_root=REPO_ROOT / "skills",
+            skills_root=skills_root,
             dest_root=args.dest.expanduser(),
             force=args.force,
+            platform=args.platform,
+            scopes=set(args.scope or []),
+            profile=args.profile,
+            dry_run=args.dry_run,
+        )
+        manifest_path = write_install_manifest(
+            manifest_path=args.manifest_path.expanduser(),
+            platform=args.platform,
+            installed_manifests=selected,
             dry_run=args.dry_run,
         )
 
         if args.dry_run:
             print("DRY_RUN no files written")
-        print("surface: Codex example installer")
+        print(f"surface: {args.platform} example installer")
+        print(f"selected_skills: {len(selected)}")
+        if args.profile:
+            print(f"profile_filter: {args.profile}")
+        if args.scope:
+            print(f"scope_filter: {', '.join(args.scope)}")
+        print(f"manifest_path: {manifest_path}")
         for result in results:
             line = f"{result.action} {result.name} -> {result.path}"
             if result.backup_path is not None:

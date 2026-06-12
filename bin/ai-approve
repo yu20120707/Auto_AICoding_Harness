@@ -22,6 +22,7 @@ from core.state import (
     update_state_for_diff_approved,
     write_state_payload,
 )
+from core.state_machine import assert_waiting_gate_for_decision
 from core.verification import has_meaningful_verification
 
 def parse_args() -> argparse.Namespace:
@@ -40,10 +41,7 @@ def require_waiting_gate(target_root: Path, gate: str) -> dict:
     state = load_state(target_root)
     if state is None:
         raise RuntimeError("target repository is not initialized: missing .ai/state.json")
-    if state.get("status") != config.waiting_status:
-        raise RuntimeError(f"current status does not allow {gate} approval: {state.get('status')}")
-    if state.get("current_gate") != gate:
-        raise RuntimeError(f"current gate does not allow {gate} approval: {state.get('current_gate')}")
+    assert_waiting_gate_for_decision(state, gate, action="approval")
     if not (target_root / config.review_path).exists():
         raise RuntimeError(f"missing required review material: {config.review_path.as_posix()}")
     if gate == "final" and not has_meaningful_verification(target_root):

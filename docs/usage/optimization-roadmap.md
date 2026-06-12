@@ -70,17 +70,20 @@
 
 后续文档应持续使用 `scaffold`、`gate artifact`、`prompt/context artifact` 这类表述，避免让使用者误解为完整自动审查系统。
 
-### 4. `examples/` 仍是占位目录
+### 4. `examples/` 已从占位目录升级为可读样例，但仍需要持续防漂移
 
-`examples/README.md` 声明这里用于展示 small / large / profile overlay 输出，但当前没有稳定金样例。
-
-后续应该补：
+当前仓库已经有四类样例：
 
 - `examples/small/`：`ai-init small` 的代表性输出快照。
 - `examples/large/`：`ai-init small` + `ai-upgrade large` 的代表性输出快照。
-- 生成样例的说明：样例不是模板源，不参与目标项目运行。
+- `examples/cpp-linux-backend-mini/`：注入前的极小业务仓库。
+- `examples/injected-output-sample/`：注入后并进入 large-mode 任务准备态的业务仓库快照。
 
-注意：样例一旦提交，就需要有测试或脚本防止和模板源长期漂移。
+因此这里的主要问题不再是“有没有样例”，而是：
+
+- 样例和 `templates/` / `profiles/` 的关键结构是否持续同步。
+- 业务前后对照样例是否仍然保持小而清晰。
+- `.ai/backups/`、临时状态、运行期噪音是否持续被测试拦住。
 
 ### 5. profile 层偏知识包，操作性还不够
 
@@ -115,7 +118,7 @@
 
 - P0：结构收口，旧 skill 残留由测试约束，`scripts/README.md` 已更新为真实边界说明。
 - P1：安装体验收口，`ai-install-skills --dry-run` 已实现，安装边界已明确为 Codex 示例安装器。
-- P2：稳定样例，`examples/small/` 和 `examples/large/` 已提交并由测试约束。
+- P2：稳定样例，`examples/small/`、`examples/large/`、`examples/cpp-linux-backend-mini/` 和 `examples/injected-output-sample/` 已提交并由测试约束。
 - P3：profile 操作性增强，`cpp-linux-backend-system` 已生成 `docs/ai/verification-matrix.md`。
 - P4：命令体验硬化，`ai-state` 已作为薄的机器可读状态入口实现。
 
@@ -156,18 +159,20 @@
 
 ### P2：提交稳定样例
 
-目标：让用户能直接看见初始化后的目标项目长什么样。
+目标：让用户能直接看见初始化前后的目标项目，以及 large-mode 任务证据长什么样。
 
 动作：
 
 - 生成并提交 `examples/small/`。
 - 生成并提交 `examples/large/`。
+- 增加 `examples/cpp-linux-backend-mini/`，展示注入前业务仓库。
+- 增加 `examples/injected-output-sample/`，展示注入后 large-mode 任务快照。
 - 增加轻量测试，确认样例结构与模板关键文件一致。
 - 明确样例不是模板源，模板源仍然只有 `templates/` 和 `profiles/`。
 
 验收：
 
-- 新用户不用运行命令也能理解输出结构。
+- 新用户不用运行命令也能理解注入前后结构以及 large-mode 证据链。
 - 样例不会和模板源长期漂移。
 - `.ai/backups/`、临时状态、测试运行产物不进入样例。
 

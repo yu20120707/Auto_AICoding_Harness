@@ -1,0 +1,16 @@
+name: cpp-linux-system-engineering
+scope: profile
+version: 1
+install_default: false
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Review C++ and Linux backend changes for ownership, build behavior, concurrency, IO, API stability, and observability.
+triggers:
+  - c++
+  - linux backend
+  - concurrency
+  - system engineering
+profile: cpp-linux-backend-system

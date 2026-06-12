@@ -26,7 +26,7 @@ The preferred setup path is: ask the active local agent to inspect this file and
 
 | Surface | Current Automation |
 | --- | --- |
-| Codex | `bin/ai-install-skills` copies all repository skills into `$CODEX_HOME/skills` or `~/.codex/skills`. Use `--dry-run` to inspect planned writes. |
+| Codex | `bin/ai-install-skills` installs a manifest-selected subset into `$CODEX_HOME/skills` or `~/.codex/skills`. Use `--dry-run`, `--list`, `--scope system`, or `--profile cpp-linux-backend-system` to inspect or refine the selection. |
 | Claude Code | Documentation and bootstrap prompt only. The active local agent should choose the supported target path. |
 | GitHub Copilot / VS Code | Documentation and generated `.github/copilot-instructions.md` only. No automatic skill install is performed. |
 | Generic agent | Documentation and bootstrap prompt only. |
@@ -36,10 +36,12 @@ The preferred setup path is: ask the active local agent to inspect this file and
 - Do not install anything implicitly during `git clone`.
 - Do not overwrite existing global files without a backup or explicit user approval.
 - Use `bin/ai-install-skills --dry-run` before writing Codex skills when the target directory is unclear.
+- Use `bin/ai-install-skills --list` to inspect the current manifest selection before writing files.
 - Prefer symlinks when the local tool supports them and the repository path is stable.
 - Prefer copies when the target tool does not support symlinks well.
 - Keep global instructions short; put repository facts in each target project's `docs/ai/*`.
 - Keep skills portable; avoid tool-specific commands in `SKILL.md` unless the skill is explicitly platform-specific.
+- Treat `skill.yaml` as the selection contract for default installs, scope filters, profile filters, and the installed-skills manifest.
 
 ## Evidence Behind The Targets
 

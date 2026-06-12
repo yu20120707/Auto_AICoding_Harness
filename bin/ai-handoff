@@ -14,6 +14,7 @@ if str(REPO_ROOT) not in sys.path:
 from core.context import HANDOFF_PATH, collect_optional_git_summary, render_handoff
 from core.safe_write import safe_write_bytes
 from core.state import STATE_RELATIVE_PATH, load_state
+from core.task_chain import sync_large_task_chain
 
 
 def parse_args() -> argparse.Namespace:
@@ -52,6 +53,18 @@ def main() -> int:
         if result.backup_path is not None:
             line += f" (backup: {result.backup_path.relative_to(target_root).as_posix()})"
         print(line)
+        if result.action in {"CREATED", "OVERWRITTEN"}:
+            sync_results = sync_large_task_chain(
+                target_root=target_root,
+                state=state,
+                force=args.force,
+                timestamp=timestamp,
+            )
+            for sync_result in sync_results:
+                sync_line = f"{sync_result.action} {sync_result.path.relative_to(target_root).as_posix()}"
+                if sync_result.backup_path is not None:
+                    sync_line += f" (backup: {sync_result.backup_path.relative_to(target_root).as_posix()})"
+                print(sync_line)
         return 0
     except Exception as exc:
         print(f"error: {exc}", file=sys.stderr)

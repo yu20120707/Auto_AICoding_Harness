@@ -36,6 +36,10 @@ class AiContextHandoffIntegrationTest(unittest.TestCase):
         self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-init"), "small").returncode, 0)
         if large:
             self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-upgrade"), "large").returncode, 0)
+            self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "spec").returncode, 0)
+            self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-approve"), "spec").returncode, 0)
+            self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-review"), "plan").returncode, 0)
+            self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-approve"), "plan").returncode, 0)
         self.assertEqual(self.run_git(tmpdir, "add", ".").returncode, 0)
         agents = tmpdir / "AGENTS.md"
         agents.write_text(agents.read_text(encoding="utf-8") + "\nlocal change\n", encoding="utf-8")
@@ -94,6 +98,8 @@ class AiContextHandoffIntegrationTest(unittest.TestCase):
             self.assertIn("## Plan Snapshot", handoff_text)
             self.assertIn("## Verification Snapshot", handoff_text)
             self.assertIn(".ai/reviews/diff-review.md", context_text)
+            self.assertTrue((tmpdir / "docs" / "ai" / "tasks" / "init-large" / "04-diff-review.md").exists())
+            self.assertTrue((tmpdir / "docs" / "ai" / "tasks" / "init-large" / "07-handoff.md").exists())
 
     def test_large_handoff_mentions_spec_plan_and_verification_summary(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
@@ -117,6 +123,8 @@ class AiContextHandoffIntegrationTest(unittest.TestCase):
             self.assertIn("- plan approved", handoff_text)
             self.assertIn("py tests/test_ai_init_small.py -> passed", handoff_text)
             self.assertIn("py tests/test_e2e_workflow.py", handoff_text)
+            self.assertTrue((tmpdir / "docs" / "ai" / "tasks" / "init-large" / "05-verification.md").exists())
+            self.assertTrue((tmpdir / "docs" / "ai" / "tasks" / "init-large" / "07-handoff.md").exists())
 
     def test_approve_then_handoff_mentions_approval(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:

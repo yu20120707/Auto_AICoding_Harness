@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Auto_AICoding_Harness Installed Skills Manifest",
+  "type": "object",
+  "required": [
+    "platform",
+    "installed_at",
+    "skills"
+  ],
+  "properties": {
+    "platform": {
+      "type": "string",
+      "enum": ["codex", "claude-code", "copilot", "generic"]
+    },
+    "installed_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "scope", "version", "source"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["system", "profile"]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "profile": {
+            "type": ["string", "null"]
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

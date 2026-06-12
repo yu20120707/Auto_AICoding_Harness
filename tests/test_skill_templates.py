@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -31,6 +32,38 @@ SKILL_NAMES = [
     "security-review",
     "performance-analysis",
 ]
+
+DEFAULT_SKILL_NAMES = [
+    "karpathy-guidelines",
+    "task-router",
+    "repo-onboarding-analysis",
+    "planning-and-task-breakdown",
+    "task-contract-and-leveling",
+    "context-engineering",
+    "systematic-debugging",
+    "code-review-and-quality",
+    "verification-before-completion",
+    "security-review",
+]
+
+SYSTEM_SCOPE_SKILL_NAMES = [
+    "karpathy-guidelines",
+    "task-router",
+    "repo-onboarding-analysis",
+    "source-driven-development",
+    "planning-and-task-breakdown",
+    "task-contract-and-leveling",
+    "context-engineering",
+    "systematic-debugging",
+    "code-review-and-quality",
+    "test-driven-development",
+    "verification-before-completion",
+    "skill-creator",
+    "security-review",
+    "performance-analysis",
+]
+
+PROFILE_SKILL_NAMES = ["cpp-linux-system-engineering"]
 
 SKILL_SOURCE_PATHS = [
     "skills/methodology/karpathy-guidelines/SKILL.md",
@@ -80,12 +113,22 @@ class SkillTemplatesIntegrationTest(unittest.TestCase):
         self.assertEqual(self.run_cmd(tmpdir, str(REPO_ROOT / "bin" / "ai-upgrade"), "large").returncode, 0)
 
     def install_skills(self, dest: Path, *extra_args: str) -> subprocess.CompletedProcess[str]:
-        return self.run_cmd(REPO_ROOT, str(REPO_ROOT / "bin" / "ai-install-skills"), "--dest", str(dest), *extra_args)
+        manifest_path = dest.parent / "installed-skills.json"
+        return self.run_cmd(
+            REPO_ROOT,
+            str(REPO_ROOT / "bin" / "ai-install-skills"),
+            "--dest",
+            str(dest),
+            "--manifest-path",
+            str(manifest_path),
+            *extra_args,
+        )
 
     def test_repository_skill_sources_exist(self) -> None:
         self.assertTrue((SKILLS_ROOT / "README.md").exists())
         for path in SKILL_SOURCE_PATHS:
             self.assertTrue((REPO_ROOT / path).exists(), path)
+            self.assertTrue((REPO_ROOT / path).with_name("skill.yaml").exists(), path)
 
     def test_skill_directories_are_all_live_sources(self) -> None:
         live_skill_dirs = {
@@ -153,9 +196,12 @@ class SkillTemplatesIntegrationTest(unittest.TestCase):
             result = self.install_skills(dest)
             self.assertEqual(result.returncode, 0, result.stderr)
 
-            for skill_name in SKILL_NAMES:
+            for skill_name in DEFAULT_SKILL_NAMES:
                 self.assertTrue((dest / skill_name / "SKILL.md").exists(), skill_name)
                 self.assertIn(f"CREATED {skill_name}", result.stdout)
+            for skill_name in set(SKILL_NAMES) - set(DEFAULT_SKILL_NAMES):
+                self.assertFalse((dest / skill_name).exists(), skill_name)
+            self.assertIn("selected_skills: 10", result.stdout)
 
     def test_ai_install_skills_dry_run_does_not_write(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-skills-") as tmp:
@@ -164,20 +210,59 @@ class SkillTemplatesIntegrationTest(unittest.TestCase):
             result = self.install_skills(dest, "--dry-run")
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("DRY_RUN no files written", result.stdout)
-            self.assertIn("surface: Codex example installer", result.stdout)
+            self.assertIn("surface: codex example installer", result.stdout)
             self.assertIn("WOULD_CREATE karpathy-guidelines", result.stdout)
             self.assertFalse(dest.exists())
+
+    def test_scope_system_installs_optional_system_skills(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-skills-") as tmp:
+            dest = Path(tmp) / "codex-skills"
+            result = self.install_skills(dest, "--scope", "system")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            for skill_name in SYSTEM_SCOPE_SKILL_NAMES:
+                self.assertTrue((dest / skill_name / "SKILL.md").exists(), skill_name)
+            self.assertFalse((dest / "cpp-linux-system-engineering").exists())
+
+    def test_profile_filter_installs_profile_skill_subset(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-skills-") as tmp:
+            dest = Path(tmp) / "codex-skills"
+            result = self.install_skills(dest, "--profile", "cpp-linux-backend-system")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            for skill_name in PROFILE_SKILL_NAMES:
+                self.assertTrue((dest / skill_name / "SKILL.md").exists(), skill_name)
+            for skill_name in set(SKILL_NAMES) - set(PROFILE_SKILL_NAMES):
+                self.assertFalse((dest / skill_name).exists(), skill_name)
+
+    def test_list_mode_shows_selected_skills_without_writes(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-skills-") as tmp:
+            dest = Path(tmp) / "codex-skills"
+            result = self.install_skills(dest, "--list", "--scope", "system", "--profile", "cpp-linux-backend-system")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("surface: codex manifest selection", result.stdout)
+            self.assertIn("cpp-linux-system-engineering", result.stdout)
+            self.assertFalse(dest.exists())
+
+    def test_non_codex_platform_requires_list_mode(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-skills-") as tmp:
+            dest = Path(tmp) / "other-skills"
+            result = self.install_skills(dest, "--platform", "claude-code")
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("only implemented for codex", result.stderr)
+
+            list_result = self.install_skills(dest, "--platform", "claude-code", "--list")
+            self.assertEqual(list_result.returncode, 0, list_result.stderr)
+            self.assertIn("surface: claude-code manifest selection", list_result.stdout)
 
     def test_default_does_not_overwrite_global_skill(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-skills-") as tmp:
             dest = Path(tmp) / "codex-skills"
             self.assertEqual(self.install_skills(dest).returncode, 0)
-            skill_path = dest / "cpp-linux-system-engineering" / "SKILL.md"
+            skill_path = dest / "security-review" / "SKILL.md"
             skill_path.write_text("user modified\n", encoding="utf-8")
 
             result = self.install_skills(dest)
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("SKIPPED cpp-linux-system-engineering", result.stdout)
+            self.assertIn("SKIPPED security-review", result.stdout)
             self.assertEqual(skill_path.read_text(encoding="utf-8"), "user modified\n")
 
     def test_force_backs_up_and_overwrites_global_skill(self) -> None:
@@ -198,11 +283,23 @@ class SkillTemplatesIntegrationTest(unittest.TestCase):
                 "expected overwritten global skill content in backup",
             )
 
+    def test_install_writes_manifest(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-skills-") as tmp:
+            dest = Path(tmp) / "codex-skills"
+            manifest_path = Path(tmp) / "installed-skills.json"
+            result = self.install_skills(dest)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(manifest_path.exists())
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            self.assertEqual(manifest["platform"], "codex")
+            self.assertEqual({item["name"] for item in manifest["skills"]}, set(DEFAULT_SKILL_NAMES))
+
     def test_skill_manifest_and_role_routing_are_documented(self) -> None:
         readme = (SKILLS_ROOT / "README.md").read_text(encoding="utf-8")
 
         for skill_name in SKILL_NAMES:
             self.assertIn(skill_name, readme)
+            self.assertIn("skill.yaml", readme)
 
         for role in ["planner", "explorer", "implementer", "reviewer", "evaluator"]:
             self.assertIn(f"`{role}`", readme)
@@ -247,6 +344,8 @@ class SkillTemplatesIntegrationTest(unittest.TestCase):
         self.assertIn("portable skill", combined)
         self.assertIn("ai-install-skills", combined)
         self.assertIn("--dry-run", combined)
+        self.assertIn("--profile", combined)
+        self.assertIn("--scope", combined)
         self.assertIn("subagent execution", combined)
         self.assertIn("skills/", combined)
         self.assertIn("karpathy-guidelines/SKILL.md", combined)

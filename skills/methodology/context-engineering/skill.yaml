@@ -1,0 +1,15 @@
+name: context-engineering
+scope: system
+version: 1
+install_default: true
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Load the smallest useful repo context so agents stay grounded without drowning in irrelevant files.
+triggers:
+  - context selection
+  - repo exploration
+  - handoff prep
+  - subagent packet

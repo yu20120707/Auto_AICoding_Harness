@@ -65,7 +65,10 @@ If `.ai/state.json` does not exist, the target repository is `UNINITIALIZED`.
 
 ## Rules
 
-- `small` and `large` currently share the same initialized base state shape
+- `small`, `medium`, and `large` share the same initialized base state shape
+- `small` stays permissive for local work
+- `medium` adds a bounded planning / trace / verification scaffold without the full large gate chain
+- `large` enforces gate order
 - `ai-review spec` can move state to `WAITING_HUMAN_SPEC_APPROVAL`
 - `ai-approve spec` can move state to `SPEC_APPROVED`
 - `ai-reject spec` can move state to `NEEDS_REPLAN`
@@ -78,12 +81,26 @@ If `.ai/state.json` does not exist, the target repository is `UNINITIALIZED`.
 - `ai-review final` can move state to `WAITING_HUMAN_FINAL_APPROVAL`
 - `ai-approve final` can move state to `DONE` only after meaningful `.ai/verification.md` evidence exists
 - `ai-reject final` can move state to `NEEDS_MORE_TESTS`
+- in `medium` mode, `ai-review plan`, `ai-review diff`, and `ai-review final` stay available without the large-mode gate prerequisites
+- in `large` mode, `ai-review plan` requires `SPEC_APPROVED`
+- in `large` mode, `ai-review diff` requires `PLAN_APPROVED`
+- in `large` mode, `ai-review final` requires `DIFF_APPROVED`
+- a waiting-human status must agree with `current_gate`
+- `ai-doctor` diagnoses state and generated-file mismatches but does not advance state
 - `ai-dispatch` does not advance state
 - `ai-context-pack` does not advance state
 - `ai-handoff` does not advance state
 - `state.json` is not a review database
 - review text, approvals, logs, context packs, and traces stay in separate files
 - Phase 8 adds no new state transitions
+
+## Illegal Paths
+
+- `ai-review plan` before spec approval in `large`
+- `ai-review diff` before plan approval in `large`
+- `ai-review final` before diff approval in `large`
+- `ai-approve` or `ai-reject` for a gate that is not the active waiting gate
+- claiming a mode transition without a successful command that rewrote `.ai/state.json`
 
 ## Explicit Non-goals
 

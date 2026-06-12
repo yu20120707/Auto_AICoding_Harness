@@ -1,0 +1,16 @@
+name: performance-analysis
+scope: system
+version: 1.0.0
+version: 1
+install_default: false
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Evaluate latency, throughput, and resource changes with baseline, benchmark, and profile evidence.
+triggers:
+  - performance regression
+  - benchmark
+  - profiling
+  - throughput

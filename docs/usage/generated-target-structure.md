@@ -28,7 +28,18 @@ target-repo/
 │   ├── build.md
 │   ├── testing.md
 │   ├── workflow.md
-│   └── verification-matrix.md
+│   ├── verification-matrix.md
+│   └── tasks/
+│       ├── README.md
+│       └── <task-id>/
+│           ├── 00-prd.md
+│           ├── 01-spec.md
+│           ├── 02-tech-design.md
+│           ├── 03-implementation-plan.md
+│           ├── 04-diff-review.md
+│           ├── 05-verification.md
+│           ├── 06-risk-and-rollback.md
+│           └── 07-handoff.md
 ├── scripts/
 │   ├── ai_build.sh
 │   ├── ai_test.sh
@@ -46,11 +57,13 @@ target-repo/
     ├── state.json
     ├── epic.md
     ├── spec.md
+    ├── tech-design.md
     ├── scope.md
     ├── implementation-plan.md
     ├── affected-files.md
     ├── run-trace.md
     ├── verification.md
+    ├── risk-and-rollback.md
     ├── evaluation.md
     ├── context-pack.md
     ├── handoff.md
@@ -95,18 +108,23 @@ Auto_AICoding_Harness/
 
 - `ai-init small` creates the base repository structure: `AGENTS.md`, `docs/ai/`, `scripts/`, `.ai/state.json`, and `.ai/templates/`.
 - `ai-init small` also adds `docs/ai/workflow.md` so target projects have a durable execution contract outside runtime state.
+- `ai-init medium` creates the same base structure plus `.ai/implementation-plan.md`, `.ai/run-trace.md`, and `.ai/verification.md`.
+- `ai-upgrade medium` adds that same bounded medium scaffold when starting from `small`.
 - `ai-upgrade large` adds the richer `.ai/` planning and review scaffold such as `epic.md`, `spec.md`, `scope.md`, `implementation-plan.md`, `affected-files.md`, `run-trace.md`, `verification.md`, `evaluation.md`, `reviews/`, and `approvals/`.
+- `ai-upgrade large` also creates a task-scoped evidence chain under `docs/ai/tasks/<task-id>/` so large-mode work has a durable PRD/spec/design/plan/review/verification/handoff trail.
+- `ai-upgrade large` also leaves command-line evidence and sets up the next-action path for the strict large-mode gate chain.
 - `run-trace.md` is also the required place to record any real subagent dispatch with explicit role-to-skill mapping.
 - `ai-dispatch` appends that standardized dispatch record into `run-trace.md` when large mode is active.
 - `ai-upgrade large` also adds optional `.codex/agents/` role templates.
 - `ai-upgrade large` also adds `.ai/subagent-packets/` prompt/context templates for bounded role delegation.
-- `ai-install-skills` installs the repository-owned skill set into the user's Codex skills directory as an example installer.
+- `ai-install-skills` installs a manifest-selected repository-owned skill subset into the user's Codex skills directory as an example installer.
 - `prompts/bootstrap-local-agent.md` tells the active local agent how to install the same sources into its own supported locations.
 - `ai-upgrade large` does not generate `.agents/skills/`; target projects use installed or copied skills after local-agent setup.
 - `ai-context-pack` creates `.ai/context-pack.md`.
 - `ai-handoff` creates `.ai/handoff.md`.
 - `ai-review ...` creates files under `.ai/reviews/`.
 - `ai-approve ...` and `ai-reject ...` create files under `.ai/approvals/`.
+- `ai-doctor` inspects `.ai/state.json`, generated workflow files, and obvious mode mismatches without writing new runtime state.
 - `--force` operations create files under `.ai/backups/`.
 
 ## Commit Guidance

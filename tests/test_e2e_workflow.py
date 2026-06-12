@@ -89,6 +89,15 @@ class EndToEndWorkflowTest(unittest.TestCase):
                 ".ai/context-pack.md",
                 ".ai/handoff.md",
                 ".ai/verification.md",
+                "docs/ai/tasks/README.md",
+                "docs/ai/tasks/init-large/00-prd.md",
+                "docs/ai/tasks/init-large/01-spec.md",
+                "docs/ai/tasks/init-large/02-tech-design.md",
+                "docs/ai/tasks/init-large/03-implementation-plan.md",
+                "docs/ai/tasks/init-large/04-diff-review.md",
+                "docs/ai/tasks/init-large/05-verification.md",
+                "docs/ai/tasks/init-large/06-risk-and-rollback.md",
+                "docs/ai/tasks/init-large/07-handoff.md",
             ]:
                 self.assertTrue((tmpdir / path).exists(), path)
 

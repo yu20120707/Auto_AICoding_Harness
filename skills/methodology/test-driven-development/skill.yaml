@@ -1,0 +1,15 @@
+name: test-driven-development
+scope: system
+version: 1
+install_default: false
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Enforce red-green-refactor so behavior changes start from a failing test and end with explicit proof.
+triggers:
+  - tdd
+  - failing test first
+  - red green refactor
+  - behavior change

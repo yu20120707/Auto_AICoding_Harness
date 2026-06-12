@@ -1,0 +1,15 @@
+name: security-review
+scope: system
+version: 1
+install_default: true
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Escalate and review auth, secrets, input parsing, filesystem, subprocess, IPC, and network boundary risk.
+triggers:
+  - auth
+  - permissions
+  - secrets
+  - security boundary

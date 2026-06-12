@@ -18,6 +18,8 @@ The safer model is to provide clear sources, suggested targets, and a bootstrap 
 - Canonical skill source: `skills/`
 - Example installer: `bin/ai-install-skills`
 - Dry-run inspection: `bin/ai-install-skills --dry-run`
+- Manifest inspection: `bin/ai-install-skills --list`
+- Subset selection: `bin/ai-install-skills --scope system` or `--profile cpp-linux-backend-system`
 - Target-project entrypoint: `AGENTS.md`
 - Runtime state: `.ai/*`
 

@@ -1,0 +1,28 @@
+{
+  "name": "cpp-linux-backend-system",
+  "display_name": "C++ Linux Backend System",
+  "version": 1,
+  "languages": [
+    "cpp"
+  ],
+  "domains": [
+    "linux",
+    "backend",
+    "system",
+    "network"
+  ],
+  "risk_triggers": [
+    "public_header_change",
+    "concurrency_change",
+    "network_io_change",
+    "memory_lifetime_change",
+    "syscall_error_handling_change",
+    "build_system_change"
+  ],
+  "verification": {
+    "build": "project_defined",
+    "test": "project_defined",
+    "sanitizer": "optional",
+    "benchmark": "optional"
+  }
+}

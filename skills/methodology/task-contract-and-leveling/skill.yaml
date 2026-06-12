@@ -1,0 +1,15 @@
+name: task-contract-and-leveling
+scope: system
+version: 1
+install_default: true
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Turn a request into an explicit execution contract covering level, scope, verification, and blockers.
+triggers:
+  - task contract
+  - execution level
+  - risk classification
+  - blocker check

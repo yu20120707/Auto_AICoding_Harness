@@ -12,7 +12,8 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.state import write_state
-from core.template import materialize_templates
+from core.profile import load_profile
+from core.template import materialize_template_stage
 
 
 DEFAULT_PROFILE = "cpp-linux-backend-system"
@@ -20,7 +21,7 @@ DEFAULT_PROFILE = "cpp-linux-backend-system"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Initialize a target repository with Auto_AICoding_harness.")
-    parser.add_argument("mode", choices=["small"])
+    parser.add_argument("mode", choices=["small", "medium"])
     parser.add_argument("--force", action="store_true", help="overwrite managed files after backing them up")
     parser.add_argument(
         "--profile",
@@ -35,18 +36,25 @@ def main() -> int:
         args = parse_args()
         target_root = Path.cwd()
         timestamp = datetime.now().astimezone().strftime("%Y%m%d-%H%M%S")
+        load_profile(REPO_ROOT, args.profile)
 
-        results = materialize_templates(
+        roots = ["base/root", f"profiles/{args.profile}/root"]
+        if args.mode == "medium":
+            roots.append("base/medium/root")
+
+        results = materialize_template_stage(
             harness_root=REPO_ROOT,
             target_root=target_root,
             profile=args.profile,
             force=args.force,
             timestamp=timestamp,
+            roots=roots,
         )
         results.append(
             write_state(
                 target_root=target_root,
                 profile=args.profile,
+                mode=args.mode,
                 force=args.force,
                 timestamp=timestamp,
             )

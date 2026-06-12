@@ -36,8 +36,13 @@ Windows:
 py bin/ai-status
 py bin/ai-install-skills
 py bin/ai-install-skills --dry-run
+py bin/ai-install-skills --scope system
+py bin/ai-install-skills --profile cpp-linux-backend-system
 py bin/ai-init small
+py bin/ai-init medium
+py bin/ai-upgrade medium
 py bin/ai-upgrade large
+py bin/ai-doctor
 py bin/ai-dispatch planner --scope "docs/design/*" --objective "plan bounded hardening" --expected-output "plan + risks" --result-location ".ai/run-trace.md"
 py bin/ai-state
 ```
@@ -48,8 +53,13 @@ py bin/ai-state
 python3 bin/ai-status
 python3 bin/ai-install-skills
 python3 bin/ai-install-skills --dry-run
+python3 bin/ai-install-skills --scope system
+python3 bin/ai-install-skills --profile cpp-linux-backend-system
 python3 bin/ai-init small
+python3 bin/ai-init medium
+python3 bin/ai-upgrade medium
 python3 bin/ai-upgrade large
+python3 bin/ai-doctor
 python3 bin/ai-dispatch planner --scope "docs/design/*" --objective "plan bounded hardening" --expected-output "plan + risks" --result-location ".ai/run-trace.md"
 python3 bin/ai-state
 ```
@@ -59,6 +69,7 @@ python3 bin/ai-state
 ```bash
 bin/ai-status
 bin/ai-init small
+bin/ai-init medium
 ```
 
 ## 拉库后先对本地 Agent 说什么
@@ -108,11 +119,11 @@ bin/ai-init small
 1. 拉取本仓库。
 2. 让本地 agent 阅读 `README.md`、`AGENTS.md`、`docs/install-targets.md` 和 `prompts/bootstrap-local-agent.md`。
 3. 执行 `ai-install-skills`，把仓库内 skills 安装到当前 agent 支持的位置。
-4. 在目标项目根目录执行 `ai-init small`。
-5. 普通任务保持 small mode。
+4. 在目标项目根目录执行 `ai-init small` 或 `ai-init medium`。
+5. 普通任务保持 small mode；多文件但边界清晰的任务可以直接用 medium。
 6. 复杂任务执行 `ai-upgrade large`，启用 spec / plan / review / approval / handoff 骨架。
 7. 如果真的要派发 subagent，先运行 `ai-dispatch`，把角色包里的 skill 显式展开并记录进 `.ai/run-trace.md`。
-8. 用 `ai-status` 查看当前状态。
+8. 用 `ai-status` 查看当前状态和 next action；怀疑状态不一致时运行 `ai-doctor`。
 
 ## 什么时候升级到 Large Mode
 
@@ -121,6 +132,12 @@ bin/ai-init small
 - 修一个局部 bug。
 - 改一个脚本、prompt、配置或少量文档。
 - 回滚成本低，当前会话里能很快验证。
+
+建议用 `medium` 的情况：
+
+- 任务跨多个文件，但仍在一个边界清晰的工作流内。
+- 你需要显式 plan、run trace、verification，但不需要完整 spec gate。
+- 你希望保留 reviewer/tester 协作空间，但不想进入 full large ceremony。
 
 建议升级到 `large` 的情况：
 
@@ -141,8 +158,12 @@ bin/ai-init small
 已实现命令：
 
 - `ai-install-skills`
+- `ai-install-skills --list / --scope / --profile`
 - `ai-init small`
+- `ai-init medium`
+- `ai-upgrade medium`
 - `ai-upgrade large`
+- `ai-doctor`
 - `ai-status`
 - `ai-state`
 - `ai-dispatch`
@@ -175,24 +196,45 @@ bin/ai-init small
 - `.ai/state.json`
 - `.ai/templates/`
 
+`ai-init medium` 在 `small` 基础上额外生成：
+
+- `.ai/implementation-plan.md`
+- `.ai/run-trace.md`
+- `.ai/verification.md`
+
 `ai-upgrade large` 追加：
 
 - `.ai/epic.md`
 - `.ai/spec.md`
+- `.ai/tech-design.md`
 - `.ai/scope.md`
 - `.ai/implementation-plan.md`
 - `.ai/affected-files.md`
 - `.ai/run-trace.md`
 - `.ai/verification.md`
+- `.ai/risk-and-rollback.md`
 - `.ai/evaluation.md`
 - `.ai/reviews/`
 - `.ai/approvals/`
 - `.ai/subagent-packets/`
 - `.codex/agents/`
+- `docs/ai/tasks/README.md`
+- `docs/ai/tasks/<task-id>/00-prd.md`
+- `docs/ai/tasks/<task-id>/01-spec.md`
+- `docs/ai/tasks/<task-id>/02-tech-design.md`
+- `docs/ai/tasks/<task-id>/03-implementation-plan.md`
+- `docs/ai/tasks/<task-id>/04-diff-review.md`
+- `docs/ai/tasks/<task-id>/05-verification.md`
+- `docs/ai/tasks/<task-id>/06-risk-and-rollback.md`
+- `docs/ai/tasks/<task-id>/07-handoff.md`
 
 `.ai/subagent-packets/` 是角色任务包模板，用来把任务目标、上下文、建议 skills、禁止事项和返回格式传给本地 agent 或 subagent。它不是自动执行器。
 
 `ai-dispatch` 是一个薄记录助手：它只会在 large mode 下读取对应角色包里的 `Required Skills` / `Optional Skills`，然后把标准 dispatch 记录追加到 `.ai/run-trace.md`。它不会启动 subagent，也不会推进状态。
+
+`ai-doctor` 用于检查 `.ai/state.json`、medium/large 生成物和明显的 only-talk / mode mismatch 问题。`ai-status` 负责展示当前状态，`ai-doctor` 负责诊断异常。
+
+large mode 现在会把主证据链同步到 `docs/ai/tasks/<task-id>/`。`.ai/` 仍然保留为运行时主工作区，`docs/ai/tasks/<task-id>/` 则提供更稳定、可审计、可交接的任务文档链。
 
 ## Skills
 
@@ -208,17 +250,24 @@ bin/ai-init small
 ```powershell
 py bin/ai-install-skills --dry-run
 py bin/ai-install-skills
+py bin/ai-install-skills --scope system
+py bin/ai-install-skills --profile cpp-linux-backend-system
+py bin/ai-install-skills --list --scope system
 py bin/ai-install-skills --force
 ```
 
-`ai-install-skills` 是 Codex 示例安装器。其他 agent 的安装位置参考 `docs/install-targets.md` 和 `prompts/bootstrap-local-agent.md`。
+`ai-install-skills` 是 Codex 示例安装器。它基于每个 skill 目录下的 `skill.yaml` 选择默认 subset，并支持 `--scope system`、`--profile cpp-linux-backend-system` 和 `--list`。其他 agent 的安装位置参考 `docs/install-targets.md` 和 `prompts/bootstrap-local-agent.md`。
+
+`cpp-linux-backend-system` 现在同时包含 `profile.yaml` 元数据。`ai-init`、`ai-upgrade` 和 `ai-install-skills --profile ...` 会先校验这个 manifest，再应用对应 overlay 或 skill 过滤。
 
 ## 仓库结构
 
 - `bin/`：用户直接执行的命令入口。
 - `core/`：safe write、模板展开、state、review、approval、context、skill install 等公共逻辑。
 - `templates/`：生成目标项目文件的唯一模板源。
+- `system/`：系统层全局行为源，例如 `AGENTS.global.md`。
 - `profiles/`：profile overlay，目前主 profile 是 `cpp-linux-backend-system`。
+- `profiles/<name>/profile.yaml`：profile 元数据入口，描述语言、领域、risk triggers 和 verification 策略。
 - `skills/`：仓库维护的可移植 skill 源。
 - `global/`：全局指令模板，例如 `AGENTS.md.template`。
 - `prompts/`：一次性 bootstrap 或 handoff prompt。
@@ -233,10 +282,15 @@ Windows:
 ```powershell
 py -m compileall bin core
 py tests/test_ai_init_small.py
+py tests/test_ai_init_medium.py
 py tests/test_ai_state.py
+py tests/test_ai_upgrade_medium.py
 py tests/test_ai_upgrade_large.py
 py tests/test_ai_dispatch.py
+py tests/test_ai_doctor.py
 py tests/test_current_capabilities.py
+py tests/test_safe_write.py
+py tests/test_state_machine.py
 py tests/test_subagent_templates.py
 py tests/test_skill_templates.py
 py tests/test_examples.py

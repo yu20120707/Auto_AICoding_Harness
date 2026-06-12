@@ -1,0 +1,15 @@
+name: skill-creator
+scope: system
+version: 1
+install_default: false
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Create or update repository-owned skills with clear metadata, provenance, installation behavior, and tests.
+triggers:
+  - create skill
+  - update skill
+  - skill metadata
+  - skill review

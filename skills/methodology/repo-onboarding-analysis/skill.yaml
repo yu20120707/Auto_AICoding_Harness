@@ -1,0 +1,15 @@
+name: repo-onboarding-analysis
+scope: system
+version: 1
+install_default: true
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Build durable, evidence-backed repo understanding before non-trivial changes start.
+triggers:
+  - repo onboarding
+  - architecture map
+  - handoff docs
+  - unfamiliar codebase

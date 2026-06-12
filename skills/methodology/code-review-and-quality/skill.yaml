@@ -1,0 +1,15 @@
+name: code-review-and-quality
+scope: system
+version: 1
+install_default: true
+platforms:
+  - codex
+  - claude-code
+  - copilot
+  - generic
+summary: Review diffs for correctness, regression risk, contract drift, missing tests, and approval readiness.
+triggers:
+  - code review
+  - diff review
+  - regression risk
+  - approval gate

@@ -11,6 +11,8 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.state import STATE_RELATIVE_PATH, load_state
+from core.state_machine import next_action_for_state, validate_state_dict
+from core.task_chain import task_dir_relative_path
 
 
 def present(path: Path) -> str:
@@ -27,6 +29,7 @@ def main() -> int:
         parse_args()
         target_root = Path.cwd()
         state = load_state(target_root)
+        validation_errors = validate_state_dict(state) if state is not None else []
 
         if state is None:
             print("initialized: no")
@@ -41,6 +44,11 @@ def main() -> int:
             print(f"profile: {state.get('profile', '-')}")
             current_gate = state.get("current_gate")
             print(f"current_gate: {current_gate if current_gate is not None else 'none'}")
+            approved_gates = ", ".join(state.get("approved_gates", [])) or "none"
+            print(f"approved_gates: {approved_gates}")
+            print(f"state_valid: {'yes' if not validation_errors else 'no'}")
+            if validation_errors:
+                print(f"state_errors: {' | '.join(validation_errors)}")
 
         print(f"AGENTS.md: {present(target_root / 'AGENTS.md')}")
         print(f".ai/state.json: {present(target_root / STATE_RELATIVE_PATH)}")
@@ -48,6 +56,12 @@ def main() -> int:
         print(f"scripts/ai_check.sh: {present(target_root / 'scripts' / 'ai_check.sh')}")
         print(f"context_pack: {present(target_root / '.ai' / 'context-pack.md')}")
         print(f"handoff: {present(target_root / '.ai' / 'handoff.md')}")
+        medium_plan = target_root / ".ai" / "implementation-plan.md"
+        medium_trace = target_root / ".ai" / "run-trace.md"
+        medium_verification = target_root / ".ai" / "verification.md"
+        if (state and state.get("mode") in {"medium", "large"}) or any(path.exists() for path in [medium_plan, medium_trace, medium_verification]):
+            medium_present = all(path.exists() for path in [medium_plan, medium_trace, medium_verification])
+            print(f"medium files: {'present' if medium_present else 'absent'}")
         large_epic = target_root / ".ai" / "epic.md"
         reviews_dir = target_root / ".ai" / "reviews"
         approvals_dir = target_root / ".ai" / "approvals"
@@ -55,6 +69,17 @@ def main() -> int:
             print(f"large files: {'present' if large_epic.exists() else 'absent'}")
             print(f"reviews dir: {'present' if reviews_dir.exists() else 'absent'}")
             print(f"approvals dir: {'present' if approvals_dir.exists() else 'absent'}")
+            if state is not None:
+                task_chain_dir = target_root / task_dir_relative_path(state)
+                print(
+                    "task_chain: "
+                    + (
+                        f"present ({task_dir_relative_path(state).as_posix()})"
+                        if task_chain_dir.exists()
+                        else f"absent ({task_dir_relative_path(state).as_posix()})"
+                    )
+                )
+        print(f"next_action: {next_action_for_state(state) if not validation_errors else 'Run ai-doctor to inspect the invalid state.'}")
         return 0
     except Exception as exc:
         print(f"error: {exc}", file=sys.stderr)
