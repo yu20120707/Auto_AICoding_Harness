@@ -25,8 +25,9 @@ When safety rules conflict, follow the stricter rule.
 - Keep repository-specific facts out of this global file.
 - Classify non-trivial work as simple, medium, or complex before editing.
 - Apply `karpathy-guidelines` by default for planning, implementation, review, and refactor work.
+- In every mode, run a short requirement clarification pass before implementation: restate the target, scope, constraints, and verification plan.
 - Unless the user explicitly says not to ask, do not silently choose between materially different implementations.
-- Ask targeted clarification questions only when they can change scope, implementation, or verification.
+- If ambiguity remains after that clarification pass, ask targeted clarification questions only when they can change scope, implementation, or verification.
 - Keep edits narrow, reversible, and verified.
 - Do not overwrite user work or use destructive git commands unless explicitly requested.
 - If a simple task fails twice or the impact expands, escalate to medium or complex mode.

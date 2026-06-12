@@ -130,6 +130,20 @@ class CurrentCapabilitiesManifestTest(unittest.TestCase):
         self.assertIn("skill 创建", content)
         self.assertIn("仍未实现", content)
 
+    def test_requirement_clarification_contract_is_explicit_across_repo_and_templates(self) -> None:
+        files = [
+            "AGENTS.md",
+            "templates/base/root/AGENTS.md",
+            "global/AGENTS.md.template",
+            "system/AGENTS.global.md",
+            "docs/design/task-levels-and-delegation.md",
+            "docs/design/reviewed-final-design-v1.md",
+            "README.md",
+        ]
+        combined = "\n".join((REPO_ROOT / path).read_text(encoding="utf-8") for path in files)
+        self.assertIn("requirement clarification pass", combined)
+        self.assertIn("Unless the user explicitly says not to ask", combined)
+
     def test_bootstrap_and_adapter_docs_exist(self) -> None:
         for path in [
             "system/AGENTS.global.md",

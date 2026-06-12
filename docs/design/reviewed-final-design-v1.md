@@ -24,6 +24,7 @@ The system is split into:
 ## Core Owns
 
 - `small / medium / large` mode semantics
+- requirement-clarification behavior across all modes
 - review-gate rules
 - handoff and context-pack contracts
 - command contracts
@@ -46,6 +47,15 @@ The system is split into:
 ## Mode Model
 
 `small`, `medium`, and `large` are different control strengths on one workflow.
+
+All three modes should start with the same requirement clarification pass:
+
+- restate target
+- restate scope
+- restate constraints
+- restate verification intent
+
+If ambiguity remains and the user did not explicitly say not to ask questions, the agent should ask targeted clarification questions before implementation.
 
 `small`:
 

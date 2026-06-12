@@ -5,6 +5,15 @@
 The main agent owns user intent, scope, state, delegation, approval, and final judgment.
 Subagents own bounded analysis, bounded implementation, independent review, test design, and acceptance evidence.
 
+Across simple, medium, and complex alike, the agent should begin with a requirement clarification pass:
+
+- restate target outcome
+- restate expected scope
+- restate key constraints
+- restate verification intent
+
+If the task is still ambiguous after that pass, and the user did not explicitly say not to ask questions, ask targeted clarification questions before implementation.
+
 ## Levels
 
 ### Simple
@@ -12,6 +21,7 @@ Subagents own bounded analysis, bounded implementation, independent review, test
 Use simple mode when impact is local, rollback is easy, and verification is quick.
 
 - main agent plans, edits, reviews, and verifies directly
+- still begins with the same requirement clarification pass
 - no required subagent
 - no full `.ai/` planning gate
 - if the same simple task fails twice, escalate
@@ -21,6 +31,7 @@ Use simple mode when impact is local, rollback is easy, and verification is quic
 Use medium mode when the task spans multiple files or one bounded workflow but does not require a full gate chain.
 
 - main agent keeps ownership
+- still begins with the same requirement clarification pass
 - optional scanner or reviewer subagent
 - short plan and run trace are enough
 - no mandatory spec / plan / final approval gates
@@ -32,6 +43,7 @@ Use medium mode when the task spans multiple files or one bounded workflow but d
 Use complex mode when the task changes architecture, shared contracts, high-risk workflows, or broad repository behavior.
 
 - use large mode runtime artifacts
+- still begins with the same requirement clarification pass
 - require `spec`, `plan`, `diff`, and `final` gates when applicable
 - use planner, explorer, implementer, reviewer, and evaluator roles when available
 - store evidence in `.ai/run-trace.md`, `.ai/reviews/*`, `.ai/approvals/*`, and `.ai/evaluation.md`

@@ -27,8 +27,9 @@ Before making non-trivial changes:
 - Do not create duplicate truths for generated files outside `templates/`.
 - Prefer small, local edits that preserve contract clarity.
 - Apply `karpathy-guidelines` as the default behavioral lens for planning, code changes, reviews, and refactors in this repository.
+- In every mode, run a short requirement clarification pass before implementation: restate the target, scope, constraints, and verification plan.
 - Unless the user explicitly says not to ask, do not silently choose between materially different implementations.
-- Ask targeted clarification questions when direction, scope, acceptance criteria, or risk boundaries are ambiguous, but avoid performative questioning that would not change the work.
+- If ambiguity remains after that clarification pass, ask targeted clarification questions when direction, scope, acceptance criteria, or risk boundaries are ambiguous, but avoid performative questioning that would not change the work.
 
 ## Verification
 

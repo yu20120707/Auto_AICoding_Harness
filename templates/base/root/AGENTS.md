@@ -22,8 +22,9 @@ Always read active `.ai/` task files when they exist.
 - `large` is suitable for complex work that needs `spec`, `plan`, `diff`, and `final` gates.
 - If a simple task fails twice or the impact expands, escalate the execution level.
 - Apply `karpathy-guidelines` by default for planning, code changes, reviews, and refactors.
+- In every mode, run a short requirement clarification pass before implementation: restate the target, scope, constraints, and verification plan.
 - Unless the user explicitly says not to ask, do not silently choose between materially different implementations.
-- Ask targeted clarification questions when direction, scope, acceptance criteria, or risk boundaries are ambiguous, but avoid performative questioning that would not change the work.
+- If ambiguity remains after that clarification pass, ask targeted clarification questions when direction, scope, acceptance criteria, or risk boundaries are ambiguous, but avoid performative questioning that would not change the work.
 
 ## Harness Command Protocol
 
