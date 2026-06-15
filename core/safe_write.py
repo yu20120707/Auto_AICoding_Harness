@@ -28,6 +28,8 @@ def _ensure_allowed_relative_path(relative_path: Path) -> None:
     parts = relative_path.parts
     if not parts:
         raise ValueError("empty relative path is not allowed")
+    if ".." in parts:
+        raise ValueError(f"parent path segments are not allowed: {relative_path}")
 
     if parts[0] in {"src", "include", "tests", ".git"}:
         raise ValueError(f"refusing to write forbidden business path: {relative_path}")

@@ -18,10 +18,21 @@ class SafeWriteTest(unittest.TestCase):
     def test_parent_escape_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
             target_root = Path(tmp)
-            with self.assertRaisesRegex(ValueError, "path escapes target root"):
+            with self.assertRaisesRegex(ValueError, "parent path segments are not allowed"):
                 safe_write_bytes(
                     target_root=target_root,
                     relative_path=Path("docs") / "ai" / ".." / ".." / ".." / "outside.txt",
+                    content=b"bad\n",
+                    force=False,
+                )
+
+    def test_allowlist_bypass_with_parent_segments_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="auto-ai-harness-") as tmp:
+            target_root = Path(tmp)
+            with self.assertRaisesRegex(ValueError, "parent path segments are not allowed"):
+                safe_write_bytes(
+                    target_root=target_root,
+                    relative_path=Path("docs") / "ai" / ".." / ".." / "AGENTS.md",
                     content=b"bad\n",
                     force=False,
                 )

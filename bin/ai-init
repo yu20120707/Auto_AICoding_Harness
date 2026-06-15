@@ -14,8 +14,6 @@ if str(REPO_ROOT) not in sys.path:
 from core.state import write_state
 from core.profile import load_profile
 from core.template import materialize_template_stage
-from core.template_update import TEMPLATE_HASH_MANIFEST_PATH, build_template_hash_manifest, render_migrations_index, render_template_hash_manifest, MIGRATIONS_INDEX_PATH
-from core.safe_write import safe_write_bytes
 
 
 DEFAULT_PROFILE = "cpp-linux-backend-system"
@@ -51,26 +49,6 @@ def main() -> int:
             force=args.force,
             timestamp=timestamp,
             roots=roots,
-        )
-        results.append(
-            safe_write_bytes(
-                target_root=target_root,
-                relative_path=TEMPLATE_HASH_MANIFEST_PATH,
-                content=render_template_hash_manifest(
-                    build_template_hash_manifest(REPO_ROOT, args.profile, roots)
-                ).encode("utf-8"),
-                force=args.force,
-                timestamp=timestamp,
-            )
-        )
-        results.append(
-            safe_write_bytes(
-                target_root=target_root,
-                relative_path=MIGRATIONS_INDEX_PATH,
-                content=render_migrations_index().encode("utf-8"),
-                force=args.force,
-                timestamp=timestamp,
-            )
         )
         results.append(
             write_state(

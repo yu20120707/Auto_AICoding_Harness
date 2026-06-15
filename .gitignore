@@ -2,6 +2,8 @@
 /.ai/
 /.codex/
 /.agents/
+/.codegraph/
+/.reasonix/
 
 # Temporary outputs
 /tmp/

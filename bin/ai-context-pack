@@ -12,7 +12,6 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.context import CONTEXT_PACK_PATH, collect_optional_git_summary, render_context_pack
-from core.context_manifest import build_default_context_manifest_entries, context_manifest_relative_path, render_context_manifest
 from core.safe_write import safe_write_bytes
 from core.state import STATE_RELATIVE_PATH, load_state
 from core.task_chain import sync_large_task_chain
@@ -41,20 +40,6 @@ def main() -> int:
         state = require_initialized_state(target_root)
         git_summary = collect_optional_git_summary(target_root)
         timestamp = datetime.now().astimezone().strftime("%Y%m%d-%H%M%S")
-
-        if state.get("mode") == "large":
-            manifest_entries = build_default_context_manifest_entries(target_root, state)
-            manifest_result = safe_write_bytes(
-                target_root=target_root,
-                relative_path=context_manifest_relative_path(state),
-                content=render_context_manifest(manifest_entries).encode("utf-8"),
-                force=args.force,
-                timestamp=timestamp,
-            )
-            manifest_line = f"{manifest_result.action} {manifest_result.path.relative_to(target_root).as_posix()}"
-            if manifest_result.backup_path is not None:
-                manifest_line += f" (backup: {manifest_result.backup_path.relative_to(target_root).as_posix()})"
-            print(manifest_line)
 
         result = safe_write_bytes(
             target_root=target_root,

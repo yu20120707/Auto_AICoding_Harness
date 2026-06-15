@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
-import json
 from pathlib import Path
 import sys
 
@@ -13,8 +12,6 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.approval import GATE_CONFIGS, render_approval
-from core.review_gate import render_decision_approval_json, task_approval_relative_path, task_status_for_decision, update_task_payload_status
-from core.rca import check_rule_draft_relative_path, render_check_rule_draft, render_check_rules_index, render_rca, rca_relative_path, INDEX_PATH
 from core.safe_write import safe_write_bytes
 from core.state import (
     STATE_RELATIVE_PATH,
@@ -26,7 +23,6 @@ from core.state import (
     write_state_payload,
 )
 from core.state_machine import assert_waiting_gate_for_decision
-from core.task_state import active_task_supplement_relative_path, load_active_task_supplement
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Reject a harness gate decision.")
@@ -88,57 +84,6 @@ def main() -> int:
             if state_result.backup_path is not None:
                 state_line += f" (backup: {state_result.backup_path.relative_to(target_root).as_posix()})"
             print(state_line)
-            if updated_state.get("mode") == "large":
-                task_results = [
-                    safe_write_bytes(
-                        target_root=target_root,
-                        relative_path=task_approval_relative_path(updated_state),
-                        content=render_decision_approval_json(config=config, approved=False).encode("utf-8"),
-                        force=True,
-                        timestamp=timestamp,
-                    ),
-                    safe_write_bytes(
-                        target_root=target_root,
-                        relative_path=rca_relative_path(updated_state),
-                        content=render_rca(state=updated_state, config=config).encode("utf-8"),
-                        force=True,
-                        timestamp=timestamp,
-                    ),
-                    safe_write_bytes(
-                        target_root=target_root,
-                        relative_path=INDEX_PATH,
-                        content=render_check_rules_index().encode("utf-8"),
-                        force=False,
-                        timestamp=timestamp,
-                    ),
-                    safe_write_bytes(
-                        target_root=target_root,
-                        relative_path=check_rule_draft_relative_path(updated_state, args.gate),
-                        content=render_check_rule_draft(state=updated_state, config=config).encode("utf-8"),
-                        force=True,
-                        timestamp=timestamp,
-                    ),
-                ]
-                task_supplement = load_active_task_supplement(target_root, updated_state)
-                if task_supplement is not None and task_supplement.payload is not None:
-                    updated_task = update_task_payload_status(
-                        task_supplement.payload,
-                        status=task_status_for_decision(gate=args.gate, approved=False),
-                    )
-                    task_results.append(
-                        safe_write_bytes(
-                            target_root=target_root,
-                            relative_path=active_task_supplement_relative_path(updated_state),
-                            content=(json.dumps(updated_task, indent=2, ensure_ascii=True) + "\n").encode("utf-8"),
-                            force=True,
-                            timestamp=timestamp,
-                        )
-                    )
-                for task_result in task_results:
-                    task_line = f"{task_result.action} {task_result.path.relative_to(target_root).as_posix()}"
-                    if task_result.backup_path is not None:
-                        task_line += f" (backup: {task_result.backup_path.relative_to(target_root).as_posix()})"
-                    print(task_line)
         else:
             print("state unchanged; use --force to regenerate approval")
 
