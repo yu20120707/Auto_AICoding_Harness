@@ -13,6 +13,7 @@ if str(REPO_ROOT) not in sys.path:
 from core.state import STATE_RELATIVE_PATH, load_state
 from core.state_machine import next_action_for_state, validate_state_dict
 from core.task_chain import task_dir_relative_path
+from core.task_state import load_active_task_supplement, summarize_task_supplement
 
 
 def present(path: Path) -> str:
@@ -79,6 +80,10 @@ def main() -> int:
                         else f"absent ({task_dir_relative_path(state).as_posix()})"
                     )
                 )
+                task_supplement = load_active_task_supplement(target_root, state)
+                if task_supplement is not None:
+                    for line in summarize_task_supplement(task_supplement):
+                        print(line)
         print(f"next_action: {next_action_for_state(state) if not validation_errors else 'Run ai-doctor to inspect the invalid state.'}")
         return 0
     except Exception as exc:

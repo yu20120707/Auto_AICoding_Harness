@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import subprocess
 
+from core.context_manifest import load_context_manifest, summarize_context_manifest
 from core.task_chain import task_dir_relative_path
 from core.verification import render_verification_summary
 
@@ -45,12 +46,15 @@ def collect_optional_git_summary(target_root: Path) -> GitSummary:
 
 def render_context_pack(target_root: Path, state: dict, git_summary: GitSummary) -> str:
     task_chain_lines = ""
+    context_manifest_section = ""
     if state.get("mode") == "large":
         task_chain_lines = (
             f"- task chain: {_present(target_root / task_dir_relative_path(state))}\n"
             f"- docs/ai/tasks/{state.get('task_id', 'current-task')}/05-verification.md: "
             f"{_present(target_root / task_dir_relative_path(state) / '05-verification.md')}\n"
         )
+        manifest_result = load_context_manifest(target_root, state)
+        context_manifest_section = "## Context Manifest\n\n" + summarize_context_manifest(manifest_result) + "\n\n"
     return (
         "# Context Pack\n\n"
         "## Harness State\n\n"
@@ -81,6 +85,7 @@ def render_context_pack(target_root: Path, state: dict, git_summary: GitSummary)
         "```\n\n"
         "## Recent Review\n\n"
         f"{_recent_review_summary(target_root)}\n\n"
+        f"{context_manifest_section}"
         "## Recent Approval\n\n"
         f"{_recent_approval_summary(target_root)}\n\n"
         "## Plan Snapshot\n\n"
@@ -96,12 +101,15 @@ def render_context_pack(target_root: Path, state: dict, git_summary: GitSummary)
 
 def render_handoff(target_root: Path, state: dict, git_summary: GitSummary) -> str:
     task_chain_section = ""
+    context_manifest_section = ""
     if state.get("mode") == "large":
         task_chain_section = (
             "## Task Evidence Chain\n\n"
             f"- task_dir: {task_dir_relative_path(state).as_posix()} "
             f"({_present(target_root / task_dir_relative_path(state))})\n\n"
         )
+        manifest_result = load_context_manifest(target_root, state)
+        context_manifest_section = "## Context Manifest\n\n" + summarize_context_manifest(manifest_result) + "\n\n"
     return (
         "# Handoff\n\n"
         "## Current State\n\n"
@@ -119,6 +127,7 @@ def render_handoff(target_root: Path, state: dict, git_summary: GitSummary) -> s
         "## Validation / Review Artifacts\n\n"
         f"{_artifact_list(target_root, state)}\n\n"
         f"{task_chain_section}"
+        f"{context_manifest_section}"
         "## Plan Snapshot\n\n"
         f"{_artifact_excerpt_summary(target_root, Path('.ai') / 'spec.md', label='spec')}\n"
         f"{_artifact_excerpt_summary(target_root, Path('.ai') / 'implementation-plan.md', label='plan')}\n"
@@ -193,6 +202,7 @@ def _artifact_list(target_root: Path, state: dict) -> str:
         artifacts.extend(
             [
                 task_dir_relative_path(state) / "00-prd.md",
+                task_dir_relative_path(state) / "context.jsonl",
                 task_dir_relative_path(state) / "07-handoff.md",
             ]
         )

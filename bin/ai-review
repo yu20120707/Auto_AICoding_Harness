@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+import json
 from pathlib import Path
 import sys
 
@@ -13,6 +14,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from core.review import collect_git_diff_data, ensure_git_repo, render_diff_review
 from core.review import build_final_review, build_plan_review, build_spec_review, require_review_input_exists
+from core.review_gate import render_task_review, render_waiting_approval_json, task_approval_relative_path, task_review_relative_path, task_status_for_review_gate, update_task_payload_status
 from core.safe_write import safe_write_bytes
 from core.state import (
     STATE_RELATIVE_PATH,
@@ -25,6 +27,7 @@ from core.state import (
 )
 from core.state_machine import assert_review_allowed
 from core.task_chain import sync_large_task_chain
+from core.task_state import active_task_supplement_relative_path, load_active_task_supplement
 
 
 REVIEW_PATH = Path(".ai") / "reviews" / "diff-review.md"
@@ -107,6 +110,45 @@ def main() -> int:
             if state_result.backup_path is not None:
                 state_line += f" (backup: {state_result.backup_path.relative_to(target_root).as_posix()})"
             print(state_line)
+            task_supplement = load_active_task_supplement(target_root, updated_state)
+            if updated_state.get("mode") == "large" and task_supplement is not None and task_supplement.payload is not None:
+                task_review_result = safe_write_bytes(
+                    target_root=target_root,
+                    relative_path=task_review_relative_path(updated_state),
+                    content=render_task_review(
+                        review_type=args.review_type,
+                        source_path=review_result.path.relative_to(target_root),
+                        review_text=review_result.path.read_text(encoding="utf-8"),
+                    ).encode("utf-8"),
+                    force=True,
+                    timestamp=timestamp,
+                )
+                task_approval_result = safe_write_bytes(
+                    target_root=target_root,
+                    relative_path=task_approval_relative_path(updated_state),
+                    content=render_waiting_approval_json(
+                        review_type=args.review_type,
+                        review_text=review_result.path.read_text(encoding="utf-8"),
+                    ).encode("utf-8"),
+                    force=True,
+                    timestamp=timestamp,
+                )
+                updated_task = update_task_payload_status(
+                    task_supplement.payload,
+                    status=task_status_for_review_gate(args.review_type),
+                )
+                task_state_result = safe_write_bytes(
+                    target_root=target_root,
+                    relative_path=active_task_supplement_relative_path(updated_state),
+                    content=(json.dumps(updated_task, indent=2, ensure_ascii=True) + "\n").encode("utf-8"),
+                    force=True,
+                    timestamp=timestamp,
+                )
+                for task_result in [task_review_result, task_approval_result, task_state_result]:
+                    task_line = f"{task_result.action} {task_result.path.relative_to(target_root).as_posix()}"
+                    if task_result.backup_path is not None:
+                        task_line += f" (backup: {task_result.backup_path.relative_to(target_root).as_posix()})"
+                    print(task_line)
             sync_results = sync_large_task_chain(
                 target_root=target_root,
                 state=updated_state,
